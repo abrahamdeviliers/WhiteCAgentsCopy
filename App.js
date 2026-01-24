@@ -1,20 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import LoginScreen from './Screens/LoginScreen';
+import Dashboard from './Screens/Dashboard';
+import AppNavigator from './Navigation/AppNavigator';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import DateRangePicker from './Components/DateRangePicker';
+import CalendarInput from './Components/DateRangePicker';
+import PaymentAttempts from './Screens/PaymentAttempts';
+import SimpleTabs from './Screens/search/SimpleTabs';
+import { AuthProvider } from './Context/AuthContext';
+import Calls from './Screens/Calls';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      // <LoginScreen />
+      // <Dashboard />
+      <SafeAreaProvider>
+      {/* <SafeAreaView style = {{flex : 1}}> */}
+        {/* <DateRangePicker /> */}
+        {/* <PaymentAttempts/> */}
+        <AuthProvider>
+
+          <AppNavigator />
+          {/* <Calls /> */}
+          
+        </AuthProvider>
+        
+        {/* <SimpleTabs /> */}
+      {/* </SafeAreaView> */}
+      </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1
   },
 });

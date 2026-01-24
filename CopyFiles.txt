@@ -1,0 +1,1616 @@
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
+import { Platform, Pressable , Text} from "react-native"
+
+
+function DateRangePicker(){
+
+    const [ startDate , setStartDate] = useState(null) 
+   
+    const [ endDate , setEndDate] = useState(null)
+
+    const [activeField , setActiveField] = useState(null)
+
+    const [showPicker , setShowPicker] = useState(false)
+
+    function formDate(date){
+
+        if(!date) return '';
+        return date.toLocaleDateString('en-GB')
+
+    }
+    
+
+    function onDateChange( event , selectedDate){
+        setShowPicker(false)
+        activeField === 'start' 
+        ? setStartDate(selectedDate)
+        : setEndDate(selectedDate)
+    }
+
+    return(
+        <>
+        <Pressable  
+        onPress={ 
+            () => {
+                setActiveField('start')
+                setShowPicker(true)
+            }
+        }
+        >
+            <Text> 
+                { startDate ? formDate(startDate) : 'From date '}
+            </Text>
+        </Pressable>
+
+        <Pressable
+        onPress={ 
+            () => {
+                setActiveField('end')
+                setShowPicker(true)
+            }
+        }
+        >
+            <Text>
+
+                { endDate ? formDate(endDate) : 'end Date'}
+
+            </Text>
+
+        </Pressable>
+
+        {  showPicker && (
+            <DateTimePicker 
+
+            value = {
+                activeField === 'start' ? startDate || new Date() : endDate || new Date() 
+            }
+
+            mode = 'date'
+            display = { Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            />
+        )}
+        </>
+
+    )
+}
+
+export default DateRangePicker
+
+
+------------------------------------------
+
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import { Platform, Pressable , Text , StyleSheet } from "react-native"
+
+
+function DateRangePicker(){
+
+    const [ startDate , setStartDate] = useState(null) 
+   
+    const [ endDate , setEndDate] = useState(null)
+
+    const [activeField , setActiveField] = useState(null)
+
+    const [showPicker , setShowPicker] = useState(false)
+
+    function formDate(date){
+
+        if(!date) return '';
+        return date.toLocaleDateString('en-GB')
+
+    }
+    
+    function onDateChange( event , selectedDate){
+        setShowPicker(false)
+        activeField === 'start' 
+        ? setStartDate(selectedDate)
+        : setEndDate(selectedDate)
+    }
+
+    return(
+        <>
+        <Text style = { styles.label }> Start Date</Text>
+        <Pressable  
+        style = { styles.input}
+        onPress={ 
+            () => {
+                setActiveField('start')
+                setShowPicker(true)
+            }
+        }
+        >
+            <Ionicons name="calendar-outline" size={18} />
+            <Text style = { styles.inputText} > 
+                { startDate ? formDate(startDate) : 'From date '}
+            </Text>
+        </Pressable>
+
+        <Text style = { styles.label }> end  Date</Text>
+        <Pressable
+        style = { styles.input}
+        onPress={ 
+            () => {
+                setActiveField('end')
+                setShowPicker(true)
+            }
+        }
+        >
+            <Ionicons name="calendar-outline" size={18} />
+            <Text style = { styles.inputText}>
+
+                { endDate ? formDate(endDate) : 'end Date'}
+
+            </Text>
+        </Pressable>
+
+        {  showPicker && (
+            <DateTimePicker 
+
+            value = {
+                activeField === 'start' ? startDate || new Date() : endDate || new Date() 
+            }
+
+            mode = 'date'
+            display = { Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            />
+        )}
+        </>
+
+    )
+}
+
+
+const styles = StyleSheet.create({
+    input : {
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        flexDirection : 'row',
+        padding : 10,
+        marginBottom : 7,
+        borderRadius : 10,
+        alignItems : 'center'
+    },
+    label: { 
+        fontSize: 13, 
+        color: '#64748B' 
+    },
+    inputText: { 
+        marginLeft: 8, 
+        color: '#64748B'
+    },
+})
+
+export default DateRangePicker
+
+
+
+-------------------------------------
+
+
+
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  Platform,
+  Pressable,
+  Text,
+  StyleSheet,
+  View,
+  TextInput,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+
+function DateRangePicker({
+  showMobile = true,
+  showInterestedStatus = true,
+  showAgentId = true,
+  onMobileChange,
+  onInterestedChange,
+  onAgentIdChange,
+}) {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [mobile, setMobile] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [interestedStatus, setInterestedStatus] = useState("all");
+
+  const [activeField, setActiveField] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+
+  function formatDate(date) {
+    if (!date) return "";
+    return date.toLocaleDateString("en-GB");
+  }
+
+  function onDateChange(event, selectedDate) {
+    setShowPicker(false);
+    if (!selectedDate) return;
+
+    activeField === "start"
+      ? setStartDate(selectedDate)
+      : setEndDate(selectedDate);
+  }
+
+  return (
+    <>
+      {/* Start Date */}
+      <Text style={styles.label}>Start Date</Text>
+      <Pressable
+        style={styles.input}
+        onPress={() => {
+          setActiveField("start");
+          setShowPicker(true);
+        }}
+      >
+        <Ionicons name="calendar-outline" size={18} />
+        <Text style={styles.inputText}>
+          {startDate ? formatDate(startDate) : "From Date"}
+        </Text>
+      </Pressable>
+
+      {/* End Date */}
+      <Text style={styles.label}>End Date</Text>
+      <Pressable
+        style={styles.input}
+        onPress={() => {
+          setActiveField("end");
+          setShowPicker(true);
+        }}
+      >
+        <Ionicons name="calendar-outline" size={18} />
+        <Text style={styles.inputText}>
+          {endDate ? formatDate(endDate) : "To Date"}
+        </Text>
+      </Pressable>
+
+      {/* Mobile Number */}
+      {showMobile && (
+        <>
+          <Text style={styles.label}>Mobile Number</Text>
+          <View style={styles.input}>
+            <Ionicons name="call-outline" size={18} />
+            <TextInput
+              placeholder="Enter mobile number"
+              keyboardType="number-pad"
+              maxLength={10}
+              value={mobile}
+              onChangeText={(val) => {
+                setMobile(val);
+                onMobileChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+
+      {/* Interested Status */}
+      {showInterestedStatus && (
+        <>
+          <Text style={styles.label}>Interested Status</Text>
+          <View style={styles.input}>
+            <Ionicons name="options-outline" size={18} />
+            <Picker
+              selectedValue={interestedStatus}
+              onValueChange={(val) => {
+                setInterestedStatus(val);
+                onInterestedChange?.(val);
+              }}
+              style={{ flex: 1 }}
+            >
+              <Picker.Item label="All" value="all" />
+              <Picker.Item label="Subscribed" value="subscribed" />
+              <Picker.Item label="Not Subscribed" value="not_subscribed" />
+              <Picker.Item label="Pending" value="pending" />
+            </Picker>
+          </View>
+        </>
+      )}
+
+      {/* Agent ID */}
+      {showAgentId && (
+        <>
+          <Text style={styles.label}>Agent ID</Text>
+          <View style={styles.input}>
+            <Ionicons name="person-outline" size={18} />
+            <TextInput
+              placeholder="Enter agent id"
+              value={agentId}
+              onChangeText={(val) => {
+                setAgentId(val);
+                onAgentIdChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+
+      {/* Date Picker */}
+      {showPicker && (
+        <DateTimePicker
+          value={
+            activeField === "start"
+              ? startDate || new Date()
+              : endDate || new Date()
+          }
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onDateChange}
+        />
+      )}
+
+      {/* Submit Button */}
+      <Pressable style={styles.submitBtn}>
+        <Text style={styles.submitText}>Submit</Text>
+      </Pressable>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  /* Container spacing (optional wrapper use) */
+  container: {
+    padding: 16,
+    backgroundColor: "#F8FAFC",
+  },
+
+  /* Label above inputs */
+  label: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#64748B",
+    marginBottom: 6,
+    marginTop: 10,
+  },
+
+  /* Common input box */
+  input: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    marginBottom: 6,
+  },
+
+  /* Text inside date inputs */
+  inputText: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#111827",
+  },
+
+  /* TextInput (mobile / agent id) */
+  mobileInput: {
+    marginLeft: 10,
+    flex: 1,
+    fontSize: 14,
+    color: "#111827",
+    paddingVertical: 0,
+  },
+
+  /* Picker wrapper */
+  pickerWrapper: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 6,
+    marginBottom: 6,
+  },
+
+  /* Picker itself */
+  picker: {
+    flex: 1,
+    color: "#111827",
+  },
+
+  /* Submit button */
+  submitBtn: {
+    backgroundColor: "#2563EB",
+    height: 52,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+    shadowColor: "#2563EB",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  submitText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+});
+
+export default DateRangePicker;
+
+
+
+----------------------------------------------------
+
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  Platform,
+  Pressable,
+  Text,
+  StyleSheet,
+  View,
+  TextInput,
+} from "react-native";
+
+const STATUS_OPTIONS = ["All", "Subscribed", "Not Subscribed", "Pending"];
+
+function DateRangePicker({
+  showMobile = false,
+  showInterestedStatus = false,
+  showAgentId = false,
+  onMobileChange,
+  onInterestedChange,
+  onAgentIdChange,
+}) {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [mobile, setMobile] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [interestedStatus, setInterestedStatus] = useState("");
+
+  const [activeField, setActiveField] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [showStatusOptions, setShowStatusOptions] = useState(false);
+
+  function formatDate(date) {
+    if (!date) return "";
+    return date.toLocaleDateString("en-GB");
+  }
+
+  function onDateChange(event, selectedDate) {
+    setShowPicker(false);
+    if (!selectedDate) return;
+
+    activeField === "start"
+      ? setStartDate(selectedDate)
+      : setEndDate(selectedDate);
+  }
+
+  return (
+    <View style = { styles.maincont}>
+
+      {/* AGENT ID */}
+      {showAgentId && (
+        <>
+          <Text style={styles.label}>Agent ID</Text>
+          <View style={styles.input}>
+            <Ionicons name="person-outline" size={18} />
+            <TextInput
+              placeholder="Enter agent id"
+              value={agentId}
+              onChangeText={(val) => {
+                setAgentId(val);
+                onAgentIdChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+      {/* START DATE */}
+      <Text style={styles.label}>Start Date</Text>
+      <Pressable
+        style={styles.input}
+        onPress={() => {
+          setActiveField("start");
+          setShowPicker(true);
+        }}
+      >
+        <Ionicons name="calendar-outline" size={18} />
+        <Text style={styles.inputText}>
+          {startDate ? formatDate(startDate) : "From Date"}
+        </Text>
+      </Pressable>
+
+      {/* END DATE */}
+      <Text style={styles.label}>End Date</Text>
+      <Pressable
+        style={styles.input}
+        onPress={() => {
+          setActiveField("end");
+          setShowPicker(true);
+        }}
+      >
+        <Ionicons name="calendar-outline" size={18} />
+        <Text style={styles.inputText}>
+          {endDate ? formatDate(endDate) : "To Date"}
+        </Text>
+      </Pressable>
+
+      {/* MOBILE NUMBER */}
+      {showMobile && (
+        <>
+          <Text style={styles.label}>Mobile Number</Text>
+          <View style={styles.input}>
+            <Ionicons name="call-outline" size={18} />
+            <TextInput
+              placeholder="Enter mobile number"
+              keyboardType="number-pad"
+              maxLength={10}
+              value={mobile}
+              onChangeText={(val) => {
+                setMobile(val);
+                onMobileChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+
+      {/* INTERESTED STATUS (CUSTOM DROPDOWN) */}
+      {showInterestedStatus && (
+        <>
+          <Text style={styles.label}>Interested Status</Text>
+
+          <Pressable
+            style={styles.input}
+            onPress={() => setShowStatusOptions(!showStatusOptions)}
+          >
+            <View style={styles.selectRow}>
+              <Text style={interestedStatus ? styles.inputText : styles.placeholder}>
+                {interestedStatus || "Interested Status"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color="#6B7280" />
+            </View>
+          </Pressable>
+
+          {showStatusOptions && (
+            <View style={styles.dropdown}>
+              {STATUS_OPTIONS.map((item) => (
+                <Pressable
+                  key={item}
+                  style={styles.option}
+                  onPress={() => {
+                    setInterestedStatus(item);
+                    setShowStatusOptions(false);
+                    onInterestedChange?.(item);
+                  }}
+                >
+                  <Text style={styles.inputText}>{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </>
+      )}
+
+      
+
+      {/* DATE PICKER */}
+      {showPicker && (
+        <DateTimePicker
+          value={
+            activeField === "start"
+              ? startDate || new Date()
+              : endDate || new Date()
+          }
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onDateChange}
+        />
+      )}
+
+      {/* SUBMIT */}
+      <Pressable style={styles.submitBtn}>
+        <Text style={styles.submitText}>Submit</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  /* Container spacing (optional wrapper use) */
+  container: {
+    padding: 16,
+    backgroundColor: "#F8FAFC",
+  },
+  maincont : {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+  },
+  /* Label above inputs */
+  label: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#64748B",
+    marginBottom: 6,
+    marginTop: 10,
+  },
+
+  /* Common input box */
+  input: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    marginBottom: 6,
+  },
+
+  /* Text inside date inputs */
+  inputText: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#111827",
+  },
+
+  /* TextInput (mobile / agent id) */
+  mobileInput: {
+    marginLeft: 10,
+    flex: 1,
+    fontSize: 14,
+    color: "#111827",
+    paddingVertical: 0,
+  },
+
+  /* Picker wrapper */
+  pickerWrapper: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 6,
+    marginBottom: 6,
+  },
+
+  /* Picker itself */
+  picker: {
+    flex: 1,
+    color: "#111827",
+  },
+
+  /* Submit button */
+  submitBtn: {
+    backgroundColor: "#2563EB",
+    height: 52,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+    shadowColor: "#2563EB",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  submitText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  placeholder: {
+  marginLeft: 10,
+  fontSize: 14,
+  color: "#9CA3AF",
+},
+
+selectRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  flex: 1,
+},
+
+dropdown: {
+  borderWidth: 1,
+  borderColor: "#E5E7EB",
+  borderRadius: 10,
+  backgroundColor: "#FFFFFF",
+  marginBottom: 6,
+},
+
+option: {
+  padding: 12,
+  borderBottomWidth: 1,
+  borderBottomColor: "#E5E7EB",
+},
+
+});
+
+export default DateRangePicker;
+----------------------------
+
+
+import React, { useEffect } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
+
+const TABS = [
+  { name: "Home", icon: "home-outline" },
+  { name: "Explore", icon: "compass-outline" },
+  { name: "Profile", icon: "person-outline" },
+];
+
+export default function CustomTabBar({ state, navigation }) {
+  const activeIndex = useSharedValue(state.index);
+
+  useEffect(() => {
+    activeIndex.value = state.index;
+  }, [state.index]);
+
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.container}>
+        {TABS.map((tab, index) => {
+          const isFocused = state.index === index;
+
+          const animatedStyle = useAnimatedStyle(() => ({
+            transform: [
+              {
+                scale: withSpring(
+                  activeIndex.value === index ? 1.1 : 1
+                ),
+              },
+            ],
+          }));
+
+          return (
+            <Pressable
+              key={tab.name}
+              onPress={() => navigation.navigate(tab.name)}
+              style={styles.tab}
+            >
+              <Animated.View
+                style={[
+                  styles.iconWrapper,
+                  isFocused && styles.active,
+                  animatedStyle,
+                ]}
+              >
+                <Ionicons
+                  name={tab.icon}
+                  size={22}
+                  color={isFocused ? "#fff" : "#000"}
+                />
+              </Animated.View>
+
+              {!isFocused && (
+                <Text style={styles.label}>{tab.name}</Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  container: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 40,
+    width: "90%",
+    justifyContent: "space-between",
+    elevation: 10,
+  },
+  tab: {
+    alignItems: "center",
+    flex: 1,
+  },
+  iconWrapper: {
+    padding: 12,
+    borderRadius: 50,
+  },
+  active: {
+    backgroundColor: "#6A4CFF", // purple
+  },
+  label: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+});
+
+
+----------------------------------------------
+
+
+import { Text, View , StyleSheet, TextInput, TouchableOpacity} from 'react-native'
+import { Ionicons }from '@expo/vector-icons'
+import { useContext, useState } from 'react'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { AuthContext } from '../Context/AuthContext'
+import axios from 'axios'
+import AsyncStorage from "@react-native-async-storage/async-storage";
+function LoginScreen( { navigation }){
+
+    const [email , setEmail] = useState('')
+ 
+    const [password , setPassword] = useState('')
+
+    const [ Visible , setVisible ] = useState(false)
+
+    const { setUser } = useContext(AuthContext)
+
+    async function postData() {
+
+    if (!email || !password) {
+
+      alert("Enter User ID and Password");
+
+      return;
+
+    }
+
+    try {
+        const response = await axios.post(
+        'https://svcdev.whitecoats.com/agent/login',
+        {
+            email,
+            password,
+        },
+    {headers: {
+      "Content-Type": "application/json",
+    },}
+        );
+
+      console.log("RAW RESPONSE:", response);
+
+      console.log('status',response.data.serviceResponse.status)
+
+      console.log(response.data.agent[0].agentId)
+
+      console.log('session token',response.data.agent[0].sessionToken )
+
+
+      const agentId = response.data.agent[0].agentId
+
+      const session_token = response.data.agent[0].sessionToken
+
+    if (response.data.serviceResponse.status === "Y") {
+        
+        const profileRes = await axios.get(`https://svcdev.whitecoats.com/agent/getAgent/${agentId}`,
+            {
+                headers : {
+                    Authorization : ` Bearer ${session_token}`
+                }
+            }
+        )
+
+        // console.log('profile', profileRes)
+
+        console.log("profile" , profileRes.data.agent[0].name)
+
+        setUser(profileRes.data.agent[0].name)
+
+        navigation.replace("Bottomtabs");
+    } else {
+    alert(response.data?.message || "Invalid credentials");
+    }
+        
+    } catch (error) {
+      console.error("Login error:", error);
+      Alert.alert("Network Error", "Unable to login");
+    }
+    }
+
+    return(
+        <SafeAreaView style={{ flex: 1, backgroundColor : '#EEF7FB'  }}>
+        <View style = { styles.container }>
+
+            <View style = { styles.mainContainer}>
+                {/* main container */}
+
+                <View style = { styles.logocont}>
+                    {/* logo  container */}
+
+                    <Text style = { styles.brandText}>
+                        White<Text style = { styles.coatsfont}>Coats</Text>
+                    </Text>
+
+                    <Text style = { styles.textLight }>
+                        Lead Tracker for Healthcare Agents
+                    </Text>
+                </View>
+
+                <View style = { styles.logincont }>
+                    {/* login container */}
+
+                    <View>
+                        {/* employee id */}
+
+                        <Text style = { styles.label }>Employee Id</Text>
+
+                        <View style = { styles.empcont }>
+                            {/* id input field  */}
+
+                            <Ionicons name='person-outline' size={20} color= '#9AA5B1' />
+                            <TextInput 
+                            placeholder='Enter Email Id'
+                            placeholderTextColor='#9AA5B1'
+                            value={email}
+                            onChangeText={setEmail}
+                            autoCapitalize='none'
+                            style = { styles.inpt}
+                            />
+                        </View>
+
+                        
+
+                    </View>
+
+
+                    <View>
+                        {/* password */}
+
+                        <Text style = { styles.label }> Passsword </Text>
+
+                        <View style = { styles.passcont}>
+                            {/* password input  */}
+                            <Ionicons name='lock-closed-outline' size={20} color='#9AA5B1' />
+
+                            <TextInput
+                            placeholder='.....'
+                            placeholderTextColor='#9AA5B1'
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry={!Visible}   
+                            style = { styles.inpt}
+                            />
+
+                            {/* eye icon  */}
+
+                            <TouchableOpacity onPress={ () => setVisible(!Visible) }> 
+                               <Ionicons  
+                                name={ Visible ? 'eye-off-outline' : 'eye-outline'}
+                                size={20} 
+                                color='#9AA5B1'
+                                />
+                            </TouchableOpacity>
+
+                        </View>
+
+                    
+
+                    </View>
+                  
+
+                  <TouchableOpacity style = { styles.sign } onPress={ postData }>
+                      {/* signup button */}
+                    
+                    <Text style = { styles.signText}> Sign in </Text>
+
+                  </TouchableOpacity>
+
+
+                  <View style = { styles.forgetPass }>
+                    
+                    {/* forget password  */}
+
+                    <Text style = { styles.textLight }> Forget Password?</Text>
+
+                  </View>
+
+
+                </View>
+
+            </View>
+
+            <View style ={ [ styles.forgetPass , styles.supportcont ] } >
+                    {/* help text  */}
+
+                    <Text style = { styles.textLight }>
+                        Need help logging in?<Text style = { styles.support }>Contact Support </Text>
+                    </Text>
+
+                </View>
+
+        </View>
+        </SafeAreaView>
+    )
+}
+const styles = StyleSheet.create({
+    coatsfont : {
+        color : '#22C55E'
+    },
+    brandText : {
+
+        fontSize : 28,
+        fontWeight : '700',
+        color : '#1F2933',
+    },
+    container : {
+        flex : 1,
+        backgroundColor : '#EEF7FB',
+        padding : 16,
+        alignItems : 'center'
+    },
+    mainContainer : {
+        width: '100%',
+        alignItems: 'center',
+        gap: 16,
+    },
+    empcont : {
+        flexDirection : 'row',
+        alignItems : 'center',
+        borderColor : '#E5E7EB',
+        borderWidth : 1.5,
+        borderRadius : 10,
+        paddingHorizontal: 10,
+        height: 48,
+        gap: 8,
+    },
+    passcont : {
+        flexDirection : 'row',
+        alignItems : 'center',
+        borderColor : '#E5E7EB',
+        borderWidth : 1.5,
+        borderRadius : 10,
+        paddingHorizontal: 10,
+        height: 48,
+        gap: 8,
+    },
+    logincont : {
+       backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+        padding: 20,
+        gap: 16,
+        width: '100%',
+        maxWidth: 380,
+    },
+    inpt : {
+        flex : 1,
+    },
+    support : {
+        color : '#10A6A0',
+        fontWeight : '600'
+
+    },
+    sign : {
+        borderColor : '#10A6A0',
+        backgroundColor : '#10A6A0',
+        borderWidth : 1,
+        justifyContent : 'center',
+        alignItems : 'center',
+        borderRadius : 10,
+        padding : 10
+    },
+    signText : {
+        color : 'white',
+    },
+    forgetPass : {
+        justifyContent : 'center',
+        alignItems : 'center',
+    },
+    textLight : {
+        color : '#6B7280'
+    },
+    logocont : {
+        justifyContent : 'center',
+        alignItems : 'center',
+    },
+    label : {
+        color : '#1F2933',
+        fontSize : 18,
+        fontWeight : '600',
+        marginBottom : 8
+    },
+    supportcont : {
+        marginTop : 10
+    }
+
+})
+export default LoginScreen
+
+
+
+
+-----------------------------------
+
+
+
+
+import React, { useContext } from "react";
+import { View, FlatList, StyleSheet, Button } from "react-native";
+import CallDetailsCard from "../Components/CallDetailsCard";
+import DateRangePicker from "../Components/DateRangePicker";
+import { AuthContext } from "../Context/AuthContext";
+import axios from 'axios';
+import { useState } from "react";
+
+const CALLS_DATA = [
+  {
+    callId: 35396,
+    leadId: 70725,
+    type: "outgoing",
+    callPurpose: "Answered",
+    callResult: "Follow-Up",
+    callStartTime: "23-Jul-2025 11:54 AM",
+    leadStatus: "Budget Issue",
+    name: "Suraj Pyare",
+  },
+  {
+    callId: 35414,
+    leadId: 76086,
+    type: "incoming",
+    callPurpose: "Unwanted",
+    callResult: "Ringing No Response",
+    callStartTime: "23-Jul-2025 12:11 PM",
+    leadStatus: "New Lead",
+    name: "Balangusai T",
+  },
+];
+function Calls() {
+
+  const { sessionToken , user } = useContext(AuthContext)
+
+  const [ callsData , setCallsData ] = useState([])
+
+  async function getData(){
+
+    let response = await axios.post('https://svcdev.whitecoats.com/agent/getCallListing',
+      {
+        agentId : user.agentId
+      },
+      {
+        headers : {
+          Authorization : ` Bearer ${sessionToken}`
+        }
+      }
+    )
+
+    console.log(response.data)
+
+    setCallsData(response.data.postOutBoundCall)
+    
+  }
+
+
+  return (
+    <View style={styles.container}>
+      <DateRangePicker 
+      showStartDate = {true}
+      showEndDate = {true}
+      showMobile = {true}
+      />
+
+      <FlatList
+        data={callsData}
+        keyExtractor={(item) => item.callId.toString()}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+        <CallDetailsCard  data={item} />
+        )}
+      />
+
+      <Button  title="getdata" onPress={getData}/>
+    </View>
+  );
+}
+
+export default Calls;
+
+/* -------- STYLES -------- */
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // backgroundColor: "#F8FAFC",
+  },
+  listContent: {
+    padding: 16,
+  },
+});
+-------------------------------
+
+
+
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  Platform,
+  Pressable,
+  Text,
+  StyleSheet,
+  View,
+  TextInput,
+} from "react-native";
+
+const STATUS_OPTIONS = ["All", "Subscribed", "Not Subscribed", "Pending"];
+
+function DateRangePicker({
+  showStartDate = false,
+  showEndDate = false,
+  showMobile = false,
+  showInterestedStatus = false,
+  showAgentId = false,
+  onMobileChange,
+  onInterestedChange,
+  onAgentIdChange,
+  onStartDateChange,
+  onEndDateChange,
+}) {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [mobile, setMobile] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [interestedStatus, setInterestedStatus] = useState("");
+
+  const [activeField, setActiveField] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [showStatusOptions, setShowStatusOptions] = useState(false);
+
+  function formatDate(date) {
+    if (!date) return "";
+    return date.toLocaleDateString("en-GB");
+  }
+
+  function onDateChange(event, selectedDate) {
+    setShowPicker(false);
+    if (!selectedDate) return;
+
+    if (activeField === "start") {
+      setStartDate(selectedDate);
+      onStartDateChange?.(selectedDate);
+    } else {
+      setEndDate(selectedDate);
+      onEndDateChange?.(selectedDate);
+    }
+  }
+
+  return (
+    <View style={styles.maincont}>
+
+      {/* AGENT ID */}
+      {showAgentId && (
+        <>
+          <Text style={styles.label}>Agent ID</Text>
+          <View style={styles.input}>
+            <Ionicons name="person-outline" size={18} />
+            <TextInput
+              placeholder="Enter agent id"
+              value={agentId}
+              onChangeText={(val) => {
+                setAgentId(val);
+                onAgentIdChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+
+      {/* START DATE */}
+      {showStartDate && (
+        <>
+          <Text style={styles.label}>Start Date</Text>
+          <Pressable
+            style={styles.input}
+            onPress={() => {
+              setActiveField("start");
+              setShowPicker(true);
+            }}
+          >
+            <Ionicons name="calendar-outline" size={18} />
+            <Text style={startDate ? styles.inputText : styles.placeholder}>
+              {startDate ? formatDate(startDate) : "From Date"}
+            </Text>
+          </Pressable>
+        </>
+      )}
+
+      {/* END DATE */}
+      {showEndDate && (
+        <>
+          <Text style={styles.label}>End Date</Text>
+          <Pressable
+            style={styles.input}
+            onPress={() => {
+              setActiveField("end");
+              setShowPicker(true);
+            }}
+          >
+            <Ionicons name="calendar-outline" size={18} />
+            <Text style={endDate ? styles.inputText : styles.placeholder}>
+              {endDate ? formatDate(endDate) : "To Date"}
+            </Text>
+          </Pressable>
+        </>
+      )}
+
+      {/* MOBILE NUMBER */}
+      {showMobile && (
+        <>
+          <Text style={styles.label}>Mobile Number</Text>
+          <View style={styles.input}>
+            <Ionicons name="call-outline" size={18} />
+            <TextInput
+              placeholder="Enter mobile number"
+              // keyboardType="number-pad"
+              // maxLength={10}
+              value={mobile}
+              onChangeText={(val) => {
+                setMobile(val);
+                onMobileChange?.(val);
+              }}
+              style={styles.mobileInput}
+            />
+          </View>
+        </>
+      )}
+
+      {/* INTERESTED STATUS */}
+      {showInterestedStatus && (
+        <>
+          <Text style={styles.label}>Interested Status</Text>
+
+          <Pressable
+            style={styles.input}
+            onPress={() => setShowStatusOptions(!showStatusOptions)}
+          >
+            <View style={styles.selectRow}>
+              <Text
+                style={
+                  interestedStatus ? styles.inputText : styles.placeholder
+                }
+              >
+                {interestedStatus || "Interested Status"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color="#6B7280" />
+            </View>
+          </Pressable>
+
+          {showStatusOptions && (
+            <View style={styles.dropdown}>
+              {STATUS_OPTIONS.map((item) => (
+                <Pressable
+                  key={item}
+                  style={styles.option}
+                  onPress={() => {
+                    setInterestedStatus(item);
+                    setShowStatusOptions(false);
+                    onInterestedChange?.(item);
+                  }}
+                >
+                  <Text style={styles.inputText}>{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </>
+      )}
+
+      {/* DATE PICKER */}
+      {showPicker && (
+        <DateTimePicker
+          value={
+            activeField === "start"
+              ? startDate || new Date()
+              : endDate || new Date()
+          }
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onDateChange}
+        />
+      )}
+
+      {/* SUBMIT */}
+      <Pressable style={styles.submitBtn}>
+        <Text style={styles.submitText}>Submit</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  maincont: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    marginLeft : 10,
+    marginRight : 10,
+    marginTop  : 10
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#64748B",
+    marginBottom: 6,
+    marginTop: 10,
+  },
+  input: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    marginBottom: 6,
+  },
+  inputText: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#111827",
+  },
+  mobileInput: {
+    marginLeft: 10,
+    flex: 1,
+    fontSize: 14,
+    color: "#111827",
+    paddingVertical: 0,
+  },
+  placeholder: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#9CA3AF",
+  },
+  selectRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flex: 1,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    marginBottom: 6,
+  },
+  option: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  submitBtn: {
+    backgroundColor: "#2563EB",
+    height: 52,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  submitText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+});
+
+export default DateRangePicker;
+
+import React, { useContext } from "react";
+import { View, FlatList, StyleSheet, Button } from "react-native";
+import CallDetailsCard from "../Components/CallDetailsCard";
+import DateRangePicker from "../Components/DateRangePicker";
+import { AuthContext } from "../Context/AuthContext";
+import axios from 'axios';
+import { useState } from "react";
+
+const CALLS_DATA = [
+  {
+    callId: 35396,
+    leadId: 70725,
+    type: "outgoing",
+    callPurpose: "Answered",
+    callResult: "Follow-Up",
+    callStartTime: "23-Jul-2025 11:54 AM",
+    leadStatus: "Budget Issue",
+    name: "Suraj Pyare",
+  },
+  {
+    callId: 35414,
+    leadId: 76086,
+    type: "incoming",
+    callPurpose: "Unwanted",
+    callResult: "Ringing No Response",
+    callStartTime: "23-Jul-2025 12:11 PM",
+    leadStatus: "New Lead",
+    name: "Balangusai T",
+  },
+];
+function Calls() {
+
+  const { sessionToken , user } = useContext(AuthContext)
+
+  const [ callsData , setCallsData ] = useState([])
+
+  async function getData(){
+
+    let response = await axios.post('https://svcdev.whitecoats.com/agent/getCallListing',
+      {
+        agentId : user.agentId
+      },
+      {
+        headers : {
+          Authorization : ` Bearer ${sessionToken}`
+        }
+      }
+    )
+
+    console.log(response.data)
+
+    setCallsData(response.data.postOutBoundCall)
+    
+  }
+
+
+  return (
+    <View style={styles.container}>
+      <DateRangePicker 
+      showStartDate = {true}
+      showEndDate = {true}
+      showMobile = {true}
+      />
+
+      <FlatList
+        data={callsData}
+        keyExtractor={(item) => item.callId.toString()}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+        <CallDetailsCard  data={item} />
+        )}
+      />
+
+      <Button  title="getdata" onPress={getData}/>
+    </View>
+  );
+}
+
+export default Calls;
+
+/* -------- STYLES -------- */
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // backgroundColor: "#F8FAFC",
+  },
+  listContent: {
+    padding: 16,
+  },
+});
