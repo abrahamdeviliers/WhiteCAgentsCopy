@@ -9,6 +9,7 @@ import {
   View,
   TextInput,
 } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 const STATUS_OPTIONS = ["All", "Subscribed", "Not Subscribed", "Pending"];
 
@@ -191,9 +192,12 @@ function DateRangePicker({
       )}
 
       {/* SUBMIT */}
-      <Pressable style={styles.submitBtn} onPress={onSubmit}>
+      {/* <Pressable style={styles.submitBtn} onPress={onSubmit}>
         <Text style={styles.submitText}>Submit</Text>
-      </Pressable>
+      </Pressable> */}
+      <TouchableOpacity style={styles.submitBtn} onPress={onSubmit}>
+        <Text style={styles.submitText}>Submit</Text>
+      </TouchableOpacity>
     </View>
   );
 }
