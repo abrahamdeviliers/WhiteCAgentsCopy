@@ -22,6 +22,8 @@ function MoreMenu( { visible , onClose , onNavigate }){
             <MenuItem icon='pricetag-outline' label='Coupons' onPress={ () => onNavigate('Coupons')}  />
             <MenuItem icon='close-circle-outline' label='Agent Cancelled' onPress={ () => onNavigate('AgentCancelled')}  />
             <MenuItem icon='cash-outline'  label='Manual Payment'  onPress={ () => onNavigate('manualpayment')}  />
+            <MenuItem icon='person-add-outline'  label='New lead'  onPress={ () => onNavigate('newlead')}  />
+
             <MenuItem icon="log-out-outline" label="Log Out" danger />
 
         </View>

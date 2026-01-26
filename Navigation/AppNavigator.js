@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer , getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginScreen from '../Screens/LoginScreen';
 import Dashboard from '../Screens/Dashboard';
@@ -12,7 +12,26 @@ import Coupon from '../Screens/Coupon';
 import Renewels from '../Screens/Renewels';
 import ManualPayment from '../Screens/ManualPayment';
 import Profile from '../Screens/Profile';
+import NewLead from '../Screens/NewLead';
 const stack = createNativeStackNavigator()
+
+function getHeaderTitle(route){
+
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+
+    switch ( routeName ) {
+
+        case 'Home' :
+            return 'Dashboard'
+        case 'calls' :
+            return 'Calls History '
+        case 'Payment' : 
+            return 'Payments'
+        default :
+            return 'Dashboard'
+    }
+}
+
 function AppNavigator(){
 
     return (
@@ -30,6 +49,15 @@ function AppNavigator(){
                 <stack.Screen 
                 name='Bottomtabs'
                 component={ BottomTabs }
+                options={({ route }) => ({
+                headerTitle: getHeaderTitle(route),
+                headerTitleAlign: 'center',
+                headerStyle: {
+                backgroundColor: '#fff',
+                },
+                headerShadowVisible: false,
+                
+                })}
                 />
 
                 <stack.Screen name="intrested" component={ Intrested }  />
@@ -49,6 +77,8 @@ function AppNavigator(){
                 <stack.Screen name="manualpayment" component={ ManualPayment  }  />
 
                 <stack.Screen name='profile' component={ Profile } />
+
+                <stack.Screen name='newlead' component={ NewLead } />
 
             </stack.Navigator>
 
