@@ -15,20 +15,12 @@ export default function App() {
   return (
       // <LoginScreen />
       // <Dashboard />
-      <SafeAreaProvider>
-      {/* <SafeAreaView style = {{flex : 1}}> */}
-        {/* <DateRangePicker /> */}
-        {/* <PaymentAttempts/> */}
+
         <AuthProvider>
 
           <AppNavigator />
-          {/* <Calls /> */}
           
         </AuthProvider>
-        
-        {/* <SimpleTabs /> */}
-      {/* </SafeAreaView> */}
-      </SafeAreaProvider>
   );
 }
 

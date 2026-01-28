@@ -1,13 +1,22 @@
-import { useContext } from "react"
-import { AuthContext } from "../Context/AuthContext"
-import { View , Text , StyleSheet} from 'react-native'
-import { Ionicons } from "@expo/vector-icons"
-import { SafeAreaView } from "react-native-safe-area-context"
-function Profile(){
+import { useContext, useState } from "react";
+import { AuthContext } from "../Context/AuthContext";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ChangePassword from "../Components/ChangePassword";
 
-    const { user } = useContext(AuthContext)
+function Profile() {
+  const { user } = useContext(AuthContext);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
-    if (!user) {
+  if (!user) {
     return (
       <SafeAreaView style={styles.center}>
         <Text style={styles.loading}>Loading profile...</Text>
@@ -21,46 +30,66 @@ function Profile(){
     .join("")
     .toUpperCase();
 
-    return(
+  return (
+    <>
+     
         <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials}</Text>
-        </View>
+           <ScrollView>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials}</Text>
+            </View>
 
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.designation}>{user.designation}</Text>
-      </View>
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.designation}>{user.designation}</Text>
+          </View>
 
-      {/* Profile Card */}
-      <View style={styles.card}>
-        <ProfileRow
-          icon="mail-outline"
-          label="Email"
-          value={user.email}
-        />
-        <ProfileRow
-          icon="call-outline"
-          label="Mobile"
-          value={`+${user.countryCode} ${user.mobileNo}`}
-        />
-        <ProfileRow
-          icon="briefcase-outline"
-          label="Employee ID"
-          value={user.internalEmpId}
-        />
-        <ProfileRow
-          icon="shield-checkmark-outline"
-          label="Role"
-          value={user.designation}
-        />
-      </View>
-    </SafeAreaView>
+          {/* Profile Card */}
+          <View style={styles.card}>
+            <ProfileRow icon="mail-outline" label="Email" value={user.email} />
+            <ProfileRow
+              icon="call-outline"
+              label="Mobile"
+              value={`+${user.countryCode} ${user.mobileNo}`}
+            />
+            <ProfileRow
+              icon="briefcase-outline"
+              label="Employee ID"
+              value={user.internalEmpId}
+            />
+            <ProfileRow
+              icon="shield-checkmark-outline"
+              label="Role"
+              value={user.designation}
+            />
+          </View>
+
+          {/* Change Password Button */}
+          <TouchableOpacity
+            style={styles.changeBtn}
+            onPress={() => setShowChangePassword(true)}
+          >
+            <Ionicons name="key-outline" size={20} color="#fff" />
+            <Text style={styles.changeBtnText}>Change Password</Text>
+          </TouchableOpacity>
+          </ScrollView>
+        </SafeAreaView>
+
+
+      {/* Modal */}
+      <Modal
+        visible={showChangePassword}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowChangePassword(false)}
+      >
+        <ChangePassword onClose={() => setShowChangePassword(false)} />
+      </Modal>
+    </>
   );
 }
 
-/* Reusable row */
 function ProfileRow({ icon, label, value }) {
   return (
     <View style={styles.row}>
@@ -152,5 +181,21 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginTop: 2,
   },
+  changeBtn: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#10A6A0",
+  paddingVertical: 14,
+  borderRadius: 14,
+  marginTop: 24,
+},
+changeBtnText: {
+  color: "#FFFFFF",
+  fontSize: 16,
+  fontWeight: "600",
+  marginLeft: 8,
+},
+
 })
-export default Profile
+export default Profile;

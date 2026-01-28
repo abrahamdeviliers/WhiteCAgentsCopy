@@ -115,7 +115,7 @@ function PaymentAttempts() {
         onRequestClose={() => setShowModal(false)}
         presentationStyle="fullScreen"
       >
-        <SafeAreaView style={{ flex: 1,  }}
+        <SafeAreaView style={{ flex: 1, marginTop: 10 }}
     edges={['top', 'left', 'right']}>
         <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
           <View style={styles.modalHeader}>
@@ -125,7 +125,7 @@ function PaymentAttempts() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+          <ScrollView contentContainerStyle={{ paddingBottom: 40 ,  }}>
             {remainingCards.map((item, index) => (
               <ExpandableCard
                 key={item.orderId ?? index}

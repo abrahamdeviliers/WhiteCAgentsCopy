@@ -10,6 +10,7 @@ import ByAgent from './ByAgent';
 import SearchLead from './SearchLead';
 
 export default function SimpleTabs() {
+
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -42,6 +43,7 @@ export default function SimpleTabs() {
       </View>
 
     </View>
+
   );
 }
 

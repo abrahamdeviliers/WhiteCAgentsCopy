@@ -9,7 +9,6 @@ export function AuthProvider({children}){
     const [sessionToken , setSessionToken] = useState(null)
 
     
-
     return(
 
         <AuthContext.Provider value={ {user , setUser , sessionToken , setSessionToken}}>
@@ -18,5 +17,4 @@ export function AuthProvider({children}){
             
         </AuthContext.Provider>
     )
-
 }

@@ -15,7 +15,6 @@ export default function CallDetailsCard({ data }) {
 
   return (
     <>
-
       {/* -------- ROW CARD -------- */}
       <Pressable style={styles.rowCard} onPress={() => setOpen(true)}>
         <View style={styles.middle}>
@@ -50,6 +49,7 @@ export default function CallDetailsCard({ data }) {
               <Detail label="Call Result" value={data.callResult} />
               <Detail label="Doctor ID" value={data.doctorId} />
               <Detail label="Practice" value={data.practiceName} />
+              
             </View>
           </Pressable>
         </BlurView>
