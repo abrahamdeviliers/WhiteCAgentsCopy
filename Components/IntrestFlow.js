@@ -9,6 +9,9 @@ export default function InterestFlow({ leadData, planData, sessionToken, onClose
   const [step, setStep] = useState("DETAILS");
   const [category, setCategory] = useState(null);
   
+
+  const [showInterestFlow, setShowInterestFlow] = useState(false);
+  
   // ✅ Dropdown state for PreOrderForm
   const [dropdowns, setDropdowns] = useState({
     streams: [],
@@ -182,12 +185,11 @@ export default function InterestFlow({ leadData, planData, sessionToken, onClose
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,                    // ✅ CRITICAL
+  container: {               
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 18,
-    width: "100%",              // ✅ allow full width
+    width: "100%",              
   },
 
   header: {

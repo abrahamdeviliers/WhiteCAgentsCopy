@@ -11,7 +11,9 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native";
 
-const STATUS_OPTIONS = ["All", "Subscribed", "Not Subscribed", "Pending"];
+const STATUS_OPTIONS = ["Coupon/SetupCost Approval Pending", "Payment Pending", "Subscribed", "Coupon Approval Pending" ,"SetupCost Approval Pending",
+ "Coupon and SetUp Cost Rejected" , "Coupon Rejected" , "SetUp Cost Rejected"
+];
 
 function DateRangePicker({
   showStartDate = false,

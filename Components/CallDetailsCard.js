@@ -11,6 +11,7 @@ import { BlurView } from "expo-blur";
 import InterestFlow from "./IntrestFlow";
 import axios from 'axios'
 import { AuthContext } from "../Context/AuthContext";
+import BottomSheetModal from "./BottomSheetModal";
 
 export default function CallDetailsCard({ data }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -134,12 +135,13 @@ export default function CallDetailsCard({ data }) {
             >
               <Ionicons name="close" size={26} color="#fff" />
             </Pressable>
-
-            <InterestFlow
-              leadData={data} 
-              planData={planData}
-              onClose={() => setShowInterest(false)}
-            />
+            <BottomSheetModal onClose={() => setShowInterestFlow(false)}>
+              <InterestFlow
+                leadData={data} 
+                planData={planData}
+                onClose={() => setShowInterest(false)}
+              />
+            </BottomSheetModal>
           </View>
         </BlurView>
       </Modal>

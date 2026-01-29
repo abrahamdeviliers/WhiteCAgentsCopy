@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+} from "react-native";
 
-import InputField from './InputField';
-import DropdownField from './DropdownField';
+import InputField from "./InputField";
+import DropdownField from "./DropdownField";
 
 export default function PreOrderForm({
   planData,
@@ -20,57 +17,53 @@ export default function PreOrderForm({
   onPracticeChange,
 }) {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    mobileNo: '',
-    emailStr: '',
-    practiceId: '',
-    specialityId: '',
-    billingEntityName: '',
-    alternateContactName: '',
-    alternateContactNumber: '',
-    state: '',
-    city: '',
-    street: '',
-    zipCode: '',
-    country: 'India',
-    typeOfHospitalClinic: '',
+    firstName: "",
+    lastName: "",
+    mobileNo: "",
+    emailStr: "",
+    practiceId: "",
+    specialityId: "",
+    billingEntityName: "",
+    alternateContactName: "",
+    alternateContactNumber: "",
+    state: "",
+    city: "",
+    street: "",
+    zipCode: "",
+    country: "India",
+    typeOfHospitalClinic: "",
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [errors, setErrors] = useState({});
 
-  /* ---------------- PREFILL FROM API ---------------- */
+  /* ---------------- PREFILL ---------------- */
   useEffect(() => {
     if (!planData && !leadData) return;
 
     setForm(prev => ({
       ...prev,
-      firstName: planData?.firstName || leadData?.firstName || '',
-      lastName: planData?.lastName || leadData?.lastName || '',
-      mobileNo: planData?.mobileNo || leadData?.mobileNo || '',
-      emailStr: planData?.emailStr || leadData?.emailStr || '',
-      practiceId: planData?.practiceId || '',
-      specialityId: planData?.specialityId || '',
-      billingEntityName: planData?.billingEntityName || '',
-      alternateContactName: planData?.alternateContactName || '',
-      alternateContactNumber: planData?.alternateContactNumber || '',
-      state: planData?.state || '',
-      city: planData?.city || '',
-      street: planData?.street || '',
-      zipCode: planData?.zipCode || '',
-      country: planData?.country || 'India',
-      typeOfHospitalClinic: planData?.typeOfHospitalClinic || '',
+      firstName: planData?.firstName || leadData?.firstName || "",
+      lastName: planData?.lastName || leadData?.lastName || "",
+      mobileNo: planData?.mobileNo || leadData?.mobileNo || "",
+      emailStr: planData?.emailStr || leadData?.emailStr || "",
+      practiceId: planData?.practiceId || "",
+      specialityId: planData?.specialityId || "",
+      state: planData?.state || "",
+      city: planData?.city || "",
+      street: planData?.street || "",
+      zipCode: planData?.zipCode || "",
+      country: planData?.country || "India",
     }));
   }, [planData, leadData]);
 
-  /* ---------------- UPDATE FORM ---------------- */
+  /* ---------------- UPDATE ---------------- */
   const updateForm = useCallback(
     (key, value) => {
       setForm(prev => ({ ...prev, [key]: value }));
       setErrors(prev => ({ ...prev, [key]: false }));
 
-      if (key === 'practiceId' && value) {
+      if (key === "practiceId" && value) {
         onPracticeChange?.(value);
       }
     },
@@ -104,166 +97,173 @@ export default function PreOrderForm({
 
   /* ---------------- UI ---------------- */
   return (
-    <View style={styles.screen}>
-      <KeyboardAvoidingView
-        style={styles.keyboard}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.title}>Pre-Order Information</Text>
+    <View style={styles.container}>
+      {/* TITLE */}
+      <Text style={styles.title}>Pre-Order Information</Text>
 
-          {/* BASIC INFO */}
-          <InputField
-            label="First Name *"
-            value={form.firstName}
-            error={errors.firstName}
-            onChangeText={v => updateForm('firstName', v)}
-          />
+      {/* BASIC DETAILS */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Basic Details</Text>
 
-          <InputField
-            label="Last Name *"
-            value={form.lastName}
-            error={errors.lastName}
-            onChangeText={v => updateForm('lastName', v)}
-          />
+        <InputField
+          label="First Name *"
+          value={form.firstName}
+          error={errors.firstName}
+          onChangeText={v => updateForm("firstName", v)}
+        />
 
-          <InputField
-            label="Mobile Number *"
-            value={form.mobileNo}
-            keyboardType="numeric"
-            maxLength={10}
-            error={errors.mobileNo}
-            onChangeText={v => updateForm('mobileNo', v)}
-          />
+        <InputField
+          label="Last Name *"
+          value={form.lastName}
+          error={errors.lastName}
+          onChangeText={v => updateForm("lastName", v)}
+        />
 
-          <InputField
-            label="Email *"
-            value={form.emailStr}
-            keyboardType="email-address"
-            error={errors.emailStr}
-            onChangeText={v => updateForm('emailStr', v)}
-          />
+        <InputField
+          label="Mobile Number *"
+          value={form.mobileNo}
+          keyboardType="numeric"
+          maxLength={10}
+          error={errors.mobileNo}
+          onChangeText={v => updateForm("mobileNo", v)}
+        />
 
-          {/* PRACTICE */}
-          <DropdownField
-            label="Stream of Practice *"
-            value={form.practiceId}
-            options={dropdowns.streams}
-            error={errors.practiceId}
-            openDropdown={openDropdown === 'practice'}
-            onToggle={() =>
-              setOpenDropdown(openDropdown === 'practice' ? null : 'practice')
-            }
-            onSelect={value => updateForm('practiceId', value)}
-            placeholder="Select practice stream"
-          />
+        <InputField
+          label="Email *"
+          value={form.emailStr}
+          keyboardType="email-address"
+          error={errors.emailStr}
+          onChangeText={v => updateForm("emailStr", v)}
+        />
+      </View>
 
-          <DropdownField
-            label="Speciality *"
-            value={form.specialityId}
-            options={dropdowns.specialities}
-            error={errors.specialityId}
-            openDropdown={openDropdown === 'speciality'}
-            onToggle={() =>
-              setOpenDropdown(openDropdown === 'speciality' ? null : 'speciality')
-            }
-            onSelect={value => updateForm('specialityId', value)}
-            placeholder="Select speciality"
-            disabled={!form.practiceId}
-          />
+      {/* PRACTICE */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Practice Information</Text>
 
-          {/* ADDRESS */}
-          <DropdownField
-            label="State *"
-            value={form.state}
-            options={dropdowns.states.map(s => ({
-              value: s.key,
-              label: s.name,
-            }))}
-            error={errors.state}
-            openDropdown={openDropdown === 'state'}
-            onToggle={() =>
-              setOpenDropdown(openDropdown === 'state' ? null : 'state')
-            }
-            onSelect={value => updateForm('state', value)}
-          />
+        <DropdownField
+          label="Stream of Practice *"
+          value={form.practiceId}
+          options={dropdowns.streams}
+          error={errors.practiceId}
+          openDropdown={openDropdown === "practice"}
+          onToggle={() =>
+            setOpenDropdown(openDropdown === "practice" ? null : "practice")
+          }
+          onSelect={value => updateForm("practiceId", value)}
+        />
 
-          <InputField
-            label="City *"
-            value={form.city}
-            error={errors.city}
-            onChangeText={v => updateForm('city', v)}
-          />
+        <DropdownField
+          label="Speciality *"
+          value={form.specialityId}
+          options={dropdowns.specialities}
+          error={errors.specialityId}
+          openDropdown={openDropdown === "speciality"}
+          onToggle={() =>
+            setOpenDropdown(openDropdown === "speciality" ? null : "speciality")
+          }
+          onSelect={value => updateForm("specialityId", value)}
+          disabled={!form.practiceId}
+        />
+      </View>
 
-          <InputField
-            label="Street Address *"
-            value={form.street}
-            error={errors.street}
-            onChangeText={v => updateForm('street', v)}
-          />
+      {/* ADDRESS */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Address</Text>
 
-          <InputField
-            label="ZIP Code *"
-            value={form.zipCode}
-            keyboardType="numeric"
-            maxLength={6}
-            error={errors.zipCode}
-            onChangeText={v => updateForm('zipCode', v)}
-          />
+        <DropdownField
+          label="State *"
+          value={form.state}
+          options={dropdowns.states.map(s => ({
+            value: s.key,
+            label: s.name,
+          }))}
+          error={errors.state}
+          openDropdown={openDropdown === "state"}
+          onToggle={() =>
+            setOpenDropdown(openDropdown === "state" ? null : "state")
+          }
+          onSelect={value => updateForm("state", value)}
+        />
 
-          {/* SUBMIT */}
-          <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-            <Text style={styles.submitText}>Submit Pre-Order Form</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <InputField
+          label="City *"
+          value={form.city}
+          error={errors.city}
+          onChangeText={v => updateForm("city", v)}
+        />
+
+        <InputField
+          label="Street Address *"
+          value={form.street}
+          error={errors.street}
+          onChangeText={v => updateForm("street", v)}
+        />
+
+        <InputField
+          label="ZIP Code *"
+          value={form.zipCode}
+          keyboardType="numeric"
+          maxLength={6}
+          error={errors.zipCode}
+          onChangeText={v => updateForm("zipCode", v)}
+        />
+      </View>
+
+      {/* SUBMIT */}
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+        <Text style={styles.submitText}>Submit Pre-Order</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 /* ---------------- STYLES ---------------- */
+
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,                    // Full screen height
-    backgroundColor: '#F8FAFC',
+  container: {
+    backgroundColor: "#FFFFFF",
   },
-  keyboard: {
-    flex: 1,                    // Full keyboard height
-  },
-  scrollContent: {
-    padding: 20,                // Matches your old perfect padding
-    paddingBottom: 120,         // Space for submit + keyboard
-    flexGrow: 1,               
-    justifyContent: 'flex-start',
-  },
+
   title: {
     fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    color: "#0F172A",
+    textAlign: "center",
+    marginBottom: 24,
+  },
+
+  section: {
     marginBottom: 28,
-    color: '#0F172A',
-    paddingTop: 10,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
   },
+
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#475569",
+    marginBottom: 14,
+  },
+
   submitBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: "#2563EB",
     paddingVertical: 18,
-    borderRadius: 12,
-    marginTop: 32,
-    marginBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
+
   submitText: {
-    color: '#fff',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
   },
 });
