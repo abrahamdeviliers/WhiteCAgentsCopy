@@ -10,8 +10,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import InterestFlow from "./IntrestFlow";
 import axios from 'axios'
-import { AuthContext } from "../Context/AuthContext";
-import BottomSheetModal from "./BottomSheetModal";
+import { AuthContext } from "../../Context/AuthContext";
+import BottomSheetModal from "../BottomSheetModal";
 
 export default function CallDetailsCard({ data }) {
   const [showDetails, setShowDetails] = useState(false);

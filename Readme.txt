@@ -1023,3 +1023,6 @@ export default LoginScreen
 
 
 npm install @react-native-async-storage/async-storage
+
+
+expo install expo-document-picker Use expo-document-picker for upload

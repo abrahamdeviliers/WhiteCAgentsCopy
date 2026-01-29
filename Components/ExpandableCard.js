@@ -9,13 +9,15 @@ import {
   UIManager,
   Alert,
   Linking,
+  Modal
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import UploadFileModal from "./subscribedcomp/UploadFileModal";
+
 
 if (Platform.OS === "android") {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
 }
-
 
 export default function ExpandableCard({
   header,
@@ -23,11 +25,16 @@ export default function ExpandableCard({
   badgeText,
   amount,
   rows = [],
-  preOrderFormPath,     // 👈 NEW
-  onDelete,    
-  onInfo         // 👈 NEW (optional)
+  preOrderFormPath,
+  onDelete,
+  onInfo,
+  invoiceURL,
 }) {
   const [open, setOpen] = useState(false);
+
+  // ✅ hooks INSIDE component
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -36,24 +43,7 @@ export default function ExpandableCard({
 
   const handleDownload = async () => {
     if (!preOrderFormPath) return;
-
-    const supported = await Linking.canOpenURL(preOrderFormPath);
-    if (supported) {
-      Linking.openURL(preOrderFormPath);
-    } else {
-      Alert.alert("Error", "Cannot open this file");
-    }
-  };
-
-  const confirmDelete = () => {
-    Alert.alert(
-      "Delete Interested",
-      "Are you sure you want to delete this record?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: onDelete },
-      ]
-    );
+    Linking.openURL(preOrderFormPath);
   };
 
   function Row({ label, value }) {
@@ -66,73 +56,89 @@ export default function ExpandableCard({
   }
 
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={toggle}>
-      <View style={styles.card}>
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.left}>
-            <Text style={styles.title}>{header}</Text>
-            {subHeader && <Text style={styles.sub}>{subHeader}</Text>}
-          </View>
+    <>
+      <TouchableOpacity activeOpacity={0.9} onPress={toggle}>
+        <View style={styles.card}>
+          {/* HEADER */}
+          <View style={styles.header}>
+            <View style={styles.left}>
+              <Text style={styles.title}>{header}</Text>
+              {subHeader && <Text style={styles.sub}>{subHeader}</Text>}
+            </View>
 
-          <View style={styles.right}>
-            {amount && <Text style={styles.amount}>{amount}</Text>}
-            {badgeText && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{badgeText}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* DETAILS */}
-        {open && (
-          <View style={styles.details}>
-            {rows.map((row, index) => (
-              <Row key={index} label={row.label} value={row.value} />
-            ))}
-
-            {/* ACTION BUTTONS */}
-            <View style={styles.actions}>
-              {preOrderFormPath && (
-                <TouchableOpacity
-                  style={styles.downloadBtn}
-                  onPress={handleDownload}
-                >
-                  <Text style={styles.actionText}>Download Pre-Order</Text>
-                </TouchableOpacity>
+            <View style={styles.right}>
+              {amount && <Text style={styles.amount}>{amount}</Text>}
+              {badgeText && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{badgeText}</Text>
+                </View>
               )}
-
-              {onDelete && (
-                <TouchableOpacity
-                  style={styles.deleteBtn}
-                  onPress={confirmDelete}
-                >
-                  <Text style={styles.deleteText}>Delete</Text>
-                </TouchableOpacity>
-              )}
-
-             {onInfo && (
-                  <TouchableOpacity
-                    onPress={(e) => {
-                      e.stopPropagation(); // prevents card toggle
-                      onInfo();
-                    }}
-                  >
-                    <Ionicons
-                      name="information-circle-outline"
-                      size={22}
-                      color="#64748B"
-                    />
-                  </TouchableOpacity>
-                )}
             </View>
           </View>
-        )}
-      </View>
-    </TouchableOpacity>
+
+          {/* DETAILS */}
+          {open && (
+            <View style={styles.details}>
+              {rows.map((row, index) => (
+                <Row key={index} {...row} />
+              ))}
+
+              {/* ACTIONS */}
+              <View style={styles.actions}>
+                {/* UPLOAD */}
+                <TouchableOpacity
+                  style={styles.uploadBtn}
+                  onPress={() => setShowUploadModal(true)}
+                >
+                  <Text style={styles.actionText}>Upload</Text>
+                </TouchableOpacity>
+
+                {/* DOWNLOAD */}
+                {uploadedFile && (
+                  <TouchableOpacity
+                    style={styles.downloadBtn}
+                    onPress={() => Linking.openURL(uploadedFile.uri)}
+                  >
+                    <Text style={styles.actionText}>Download</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {invoiceURL && (
+                <TouchableOpacity
+                  style={styles.downloadBtn}
+                  onPress={() => Linking.openURL(invoiceURL)}
+                >
+                  <Ionicons name="download-outline" size={18} color="#fff" />
+                  <Text style={styles.downloadText}>Download Invoice</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* FILE NAME */}
+              {uploadedFile && (
+                <Text style={styles.fileName}>📄 {uploadedFile.name}</Text>
+              )}
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+
+      {/* ✅ MODAL OUTSIDE CARD */}
+      <Modal
+        visible={showUploadModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowUploadModal(false)}
+      >
+        <UploadFileModal
+          onClose={() => setShowUploadModal(false)}
+          onFileSelected={setUploadedFile}
+        />
+      </Modal>
+    </>
   );
 }
+
 
 
 const styles = StyleSheet.create({
@@ -231,5 +237,30 @@ deleteText: {
   fontWeight: "600",
   fontSize: 13,
 },
+uploadBtn: {
+  backgroundColor: "#16A34A",
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 10,
+},
 
+fileName: {
+  marginTop: 10,
+  fontSize: 12,
+  color: "#475569",
+},
+downloadBtn: {
+    marginTop: 12,
+    backgroundColor: "#2563EB",
+    paddingVertical: 10,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  downloadText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 6,
+  },
 });

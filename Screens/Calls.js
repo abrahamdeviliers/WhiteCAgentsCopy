@@ -12,7 +12,7 @@ import DateRangePicker from "../Components/DateRangePicker";
 
 import { AuthContext } from "../Context/AuthContext";
 
-import CallDetailsCard from '../Components/CallDetailsCard'
+import CallDetailsCard from "../Components/Calls/CallDetailsCard";
 
 function Calls() {
   const { user, sessionToken } = useContext(AuthContext);
