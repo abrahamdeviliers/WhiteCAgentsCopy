@@ -7,13 +7,15 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  ScrollView
+  Alert,
+  Linking,
 } from "react-native";
-// import { ScrollView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 if (Platform.OS === "android") {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
 }
+
 
 export default function ExpandableCard({
   header,
@@ -21,6 +23,9 @@ export default function ExpandableCard({
   badgeText,
   amount,
   rows = [],
+  preOrderFormPath,     // 👈 NEW
+  onDelete,    
+  onInfo         // 👈 NEW (optional)
 }) {
   const [open, setOpen] = useState(false);
 
@@ -29,17 +34,38 @@ export default function ExpandableCard({
     setOpen(!open);
   };
 
+  const handleDownload = async () => {
+    if (!preOrderFormPath) return;
+
+    const supported = await Linking.canOpenURL(preOrderFormPath);
+    if (supported) {
+      Linking.openURL(preOrderFormPath);
+    } else {
+      Alert.alert("Error", "Cannot open this file");
+    }
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Interested",
+      "Are you sure you want to delete this record?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: onDelete },
+      ]
+    );
+  };
+
   function Row({ label, value }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value ?? "-"}</Text>
-    </View>
-  );
+    return (
+      <View style={styles.row}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value}>{value ?? "-"}</Text>
+      </View>
+    );
   }
 
   return (
-    // <ScrollView>
     <TouchableOpacity activeOpacity={0.9} onPress={toggle}>
       <View style={styles.card}>
         {/* HEADER */}
@@ -63,20 +89,50 @@ export default function ExpandableCard({
         {open && (
           <View style={styles.details}>
             {rows.map((row, index) => (
-              <Row
-                key={index}
-                label={row.label}
-                value={row.value}
-              />
+              <Row key={index} label={row.label} value={row.value} />
             ))}
+
+            {/* ACTION BUTTONS */}
+            <View style={styles.actions}>
+              {preOrderFormPath && (
+                <TouchableOpacity
+                  style={styles.downloadBtn}
+                  onPress={handleDownload}
+                >
+                  <Text style={styles.actionText}>Download Pre-Order</Text>
+                </TouchableOpacity>
+              )}
+
+              {onDelete && (
+                <TouchableOpacity
+                  style={styles.deleteBtn}
+                  onPress={confirmDelete}
+                >
+                  <Text style={styles.deleteText}>Delete</Text>
+                </TouchableOpacity>
+              )}
+
+             {onInfo && (
+                  <TouchableOpacity
+                    onPress={(e) => {
+                      e.stopPropagation(); // prevents card toggle
+                      onInfo();
+                    }}
+                  >
+                    <Ionicons
+                      name="information-circle-outline"
+                      size={22}
+                      color="#64748B"
+                    />
+                  </TouchableOpacity>
+                )}
+            </View>
           </View>
         )}
       </View>
     </TouchableOpacity>
-    // </ScrollView>
   );
 }
-
 
 
 const styles = StyleSheet.create({
@@ -144,4 +200,36 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#34495e",
   },
+  actions: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 16,
+},
+
+downloadBtn: {
+  backgroundColor: "#2563EB",
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 10,
+},
+
+actionText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 13,
+},
+
+deleteBtn: {
+  backgroundColor: "#FEE2E2",
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 10,
+},
+
+deleteText: {
+  color: "#B91C1C",
+  fontWeight: "600",
+  fontSize: 13,
+},
+
 });

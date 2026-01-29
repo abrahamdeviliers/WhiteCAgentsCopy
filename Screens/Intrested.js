@@ -82,6 +82,8 @@ function Intrested() {
             subHeader={item.name}
             badgeText={item.interestStatus}
             amount={`₹ ${item.orderPrice}`}
+            preOrderFormPath={item.preOrderFormPath}   // ✅ download
+            onDelete={() => handleDelete(item.interestedId)} // ✅ delete
             rows={[
               { label: "Mobile No", value: item.mobileNo },
               { label: "Speciality", value: item.specialityName },
