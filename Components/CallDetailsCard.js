@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,46 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import InterestFlow from "./IntrestFlow";
+import axios from 'axios'
+import { AuthContext } from "../Context/AuthContext";
 
 export default function CallDetailsCard({ data }) {
   const [showDetails, setShowDetails] = useState(false);
   const [showInterest, setShowInterest] = useState(false);
+  const [planData , setPlanData] = useState(null)
+
+  const { sessionToken }  = useContext(AuthContext)
+
+  const { user } =  useContext(AuthContext)
+
+ async function fetchPlanData() {
+  try {
+    console.log("Calling planListing API...");
+
+    const res = await axios.post(
+      "https://svcdev.whitecoats.com/agent/planListing",
+      {
+        leadId: data.leadId,
+        doctorId: 10366,
+        agentId: user.agentId,
+        showAllPlans: false,
+      },
+      {
+        headers : {
+          Authorization : `Bearer ${sessionToken}`
+        }
+      }
+    );
+
+    console.log("PLAN API RESPONSE:", res.data);
+
+    const apiData = res.data?.data || {};
+    setPlanData(res.data);
+    setShowInterest(true);
+  } catch (err) {
+    console.log("PLAN API ERROR:", err?.response || err);
+  }
+}
 
   const initials = data.name
     .split(" ")
@@ -76,7 +112,7 @@ export default function CallDetailsCard({ data }) {
                 style={styles.interestBtn}
                 onPress={() => {
                   setShowDetails(false);
-                  setShowInterest(true);
+                  fetchPlanData()
                 }}
               >
                 <Ionicons name="star-outline" size={18} color="#fff" />
@@ -100,7 +136,8 @@ export default function CallDetailsCard({ data }) {
             </Pressable>
 
             <InterestFlow
-              data={data}
+              leadData={data} 
+              planData={planData}
               onClose={() => setShowInterest(false)}
             />
           </View>

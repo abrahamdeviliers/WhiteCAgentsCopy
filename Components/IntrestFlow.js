@@ -4,7 +4,7 @@ import OptionSelector from "./OptionSelector";
 import PlanSelector from "./PlanSelector";
 import PreOrderForm from "./PreOrderForm";
 
-export default function InterestFlow({ data, onClose }) {
+export default function InterestFlow({ leadData, planData, onClose }) {
   const [step, setStep] = useState("DETAILS");
   const [category, setCategory] = useState(null);
 
@@ -36,34 +36,33 @@ export default function InterestFlow({ data, onClose }) {
         </>
       )}
 
-      {/* 🔹 PRE ORDER FLOW */}
       {step === "PRE_ORDER_TYPE" && (
         <OptionSelector
           title="Pre Order Form Details"
           onSelect={opt => {
             setCategory(opt);
-            setStep("PRE_ORDER_FORM"); // ✅ FORM, NOT PLAN
+            setStep("PRE_ORDER_FORM");
           }}
           onBack={() => setStep("DETAILS")}
         />
       )}
 
-      {step === "PRE_ORDER_FORM" && (
-        <PreOrderForm
-          category={category}
-          leadData={data}
-          onBack={() => setStep("PRE_ORDER_TYPE")}
-          onClose={onClose}
-        />
-      )}
+      {step === "PRE_ORDER_FORM" && planData && (
+      <PreOrderForm
+        category={category}
+        leadData={leadData}
+        planData={planData}
+        onBack={() => setStep("PRE_ORDER_TYPE")}
+        onClose={onClose}
+      />
+    )}
 
-      {/* 🔹 AGENT INTEREST FLOW */}
       {step === "AGENT_TYPE" && (
         <OptionSelector
           title="Agent Interested Update Limit"
           onSelect={opt => {
             setCategory(opt);
-            setStep("PLAN"); // ✅ ONLY HERE
+            setStep("PLAN");
           }}
           onBack={() => setStep("DETAILS")}
         />
@@ -72,16 +71,15 @@ export default function InterestFlow({ data, onClose }) {
       {step === "PLAN" && (
         <PlanSelector
           category={category}
+          leadData={leadData}
           onBack={() => setStep("AGENT_TYPE")}
-          onConfirm={plan => {
-            console.log("FINAL PLAN:", category, plan);
-            onClose();
-          }}
+          onConfirm={() => onClose()}
         />
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

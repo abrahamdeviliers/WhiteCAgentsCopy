@@ -1,8 +1,9 @@
 import axios from "axios";
 
+const DOCTOR_ID = 10366;
+
 export async function fetchPlans({
   leadId,
-  doctorId,
   agentId,
   showAllPlans = false,
 }) {
@@ -11,7 +12,7 @@ export async function fetchPlans({
       "https://svcdev.whitecoats.com/agent/planListing",
       {
         leadId,
-        doctorId,
+        doctorId : DOCTOR_ID,
         agentId,
         showAllPlans,
       }
