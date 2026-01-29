@@ -1,169 +1,269 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  StyleSheet,
   ScrollView,
-  Pressable,
-} from "react-native";
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+
+import InputField from './InputField';
+import DropdownField from './DropdownField';
 
 export default function PreOrderForm({
-  category,
-  leadData,
   planData,
-  onBack,
-  onClose,
+  leadData,
+  dropdowns,
+  onSubmit,
+  onPracticeChange,
 }) {
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    mobile: "",
-    email: "",
-
-    altName: "",
-    altMobile: "",
-
-    billingEntity: "",
-    hospitalName: "",
-    hospitalType: "",
-
-    stream: "",
-    speciality: "",
-
-    houseNo: "",
-    street: "",
-    area: "",
-    city: "",
-    state: "",
-    zip: "",
-
-    country: "India",
-    gst: "",
+    firstName: '',
+    lastName: '',
+    mobileNo: '',
+    emailStr: '',
+    practiceId: '',
+    specialityId: '',
+    billingEntityName: '',
+    alternateContactName: '',
+    alternateContactNumber: '',
+    state: '',
+    city: '',
+    street: '',
+    zipCode: '',
+    country: 'India',
+    typeOfHospitalClinic: '',
   });
 
-  // ✅ THIS IS THE FIX
- useEffect(() => {
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [errors, setErrors] = useState({});
 
-  console.log("📋 PreOrderForm received:", { planData, leadData });
-  if (!planData) return;
+  /* ---------------- PREFILL FROM API ---------------- */
+  useEffect(() => {
+    if (!planData && !leadData) return;
 
-  setForm({
-    firstName: planData.firstName || "",
-    lastName: planData.lastName || "",
-    mobile: planData.mobileNo || leadData?.mobileNo || "",
-    email: planData.emailStr || leadData?.emailStr || "",
-    
-    altName: planData.alternateContactName || "",
-    altMobile: planData.alternateContactNumber || "",
-    
-    billingEntity: planData.billingEntityName || "",
-    hospitalName: planData.practiceName || "",
-    hospitalType: planData.typeOfHospitalClinic || "",
-    
-    stream: planData.streamOfPracticeName || "",
-    speciality: planData.specialization || "",
-    
-    houseNo: planData.housePlotNo || "",
-    street: planData.street || "",
-    area: planData.area || "",
-    city: planData.city || "",
-    state: planData.state || "",
-    zip: planData.zipCode || "",
-    
-    country: planData.country || "India",
-    gst: planData.gstNo || "",
-  });
-}, [planData, leadData]); // ✅ Add leadData here
+    setForm(prev => ({
+      ...prev,
+      firstName: planData?.firstName || leadData?.firstName || '',
+      lastName: planData?.lastName || leadData?.lastName || '',
+      mobileNo: planData?.mobileNo || leadData?.mobileNo || '',
+      emailStr: planData?.emailStr || leadData?.emailStr || '',
+      practiceId: planData?.practiceId || '',
+      specialityId: planData?.specialityId || '',
+      billingEntityName: planData?.billingEntityName || '',
+      alternateContactName: planData?.alternateContactName || '',
+      alternateContactNumber: planData?.alternateContactNumber || '',
+      state: planData?.state || '',
+      city: planData?.city || '',
+      street: planData?.street || '',
+      zipCode: planData?.zipCode || '',
+      country: planData?.country || 'India',
+      typeOfHospitalClinic: planData?.typeOfHospitalClinic || '',
+    }));
+  }, [planData, leadData]);
 
-  const set = (key, value) =>
-    setForm(prev => ({ ...prev, [key]: value }));
+  /* ---------------- UPDATE FORM ---------------- */
+  const updateForm = useCallback(
+    (key, value) => {
+      setForm(prev => ({ ...prev, [key]: value }));
+      setErrors(prev => ({ ...prev, [key]: false }));
 
-  const submit = () => {
-    const payload = {
-      category,
-      leadId: planData?.leadId,
-      doctorId: planData?.doctorId,
-      agentId: planData?.agentId,
-      ...form,
-    };
+      if (key === 'practiceId' && value) {
+        onPracticeChange?.(value);
+      }
+    },
+    [onPracticeChange]
+  );
 
-    console.log("✅ PRE ORDER SUBMIT PAYLOAD:", payload);
-    onClose();
+  /* ---------------- VALIDATION ---------------- */
+  const validateForm = () => {
+    const e = {};
+
+    if (!form.firstName) e.firstName = true;
+    if (!form.lastName) e.lastName = true;
+    if (!form.mobileNo || form.mobileNo.length !== 10) e.mobileNo = true;
+    if (!form.emailStr || !/\S+@\S+\.\S+/.test(form.emailStr)) e.emailStr = true;
+    if (!form.practiceId) e.practiceId = true;
+    if (!form.specialityId) e.specialityId = true;
+    if (!form.state) e.state = true;
+    if (!form.city) e.city = true;
+    if (!form.street) e.street = true;
+    if (!form.zipCode || form.zipCode.length !== 6) e.zipCode = true;
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
+  /* ---------------- SUBMIT ---------------- */
+  const handleSubmit = () => {
+    if (!validateForm()) return;
+    onSubmit(form);
+  };
+
+  /* ---------------- UI ---------------- */
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>Pre Order Form Details</Text>
-      <Text style={styles.category}>Selected: {category}</Text>
+    <View style={styles.screen}>
+      <KeyboardAvoidingView
+        style={styles.keyboard}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>Pre-Order Information</Text>
 
-      <Input label="First Name *" value={form.firstName} onChange={v => set("firstName", v)} />
-      <Input label="Last Name *" value={form.lastName} onChange={v => set("lastName", v)} />
-      <Input label="Mobile *" value={form.mobile} onChange={v => set("mobile", v)} />
-      <Input label="Email *" value={form.email} onChange={v => set("email", v)} />
+          {/* BASIC INFO */}
+          <InputField
+            label="First Name *"
+            value={form.firstName}
+            error={errors.firstName}
+            onChangeText={v => updateForm('firstName', v)}
+          />
 
-      <Input label="Alternate Contact Name" value={form.altName} onChange={v => set("altName", v)} />
-      <Input label="Alternate Contact Number" value={form.altMobile} onChange={v => set("altMobile", v)} />
+          <InputField
+            label="Last Name *"
+            value={form.lastName}
+            error={errors.lastName}
+            onChangeText={v => updateForm('lastName', v)}
+          />
 
-      <Input label="Billing Entity Name *" value={form.billingEntity} onChange={v => set("billingEntity", v)} />
-      <Input label="Hospital / Clinic Name" value={form.hospitalName} onChange={v => set("hospitalName", v)} />
-      <Input label="Hospital Type" value={form.hospitalType} onChange={v => set("hospitalType", v)} />
+          <InputField
+            label="Mobile Number *"
+            value={form.mobileNo}
+            keyboardType="numeric"
+            maxLength={10}
+            error={errors.mobileNo}
+            onChangeText={v => updateForm('mobileNo', v)}
+          />
 
-      <Input label="Stream of Practice *" value={form.stream} onChange={v => set("stream", v)} />
-      <Input label="Speciality *" value={form.speciality} onChange={v => set("speciality", v)} />
+          <InputField
+            label="Email *"
+            value={form.emailStr}
+            keyboardType="email-address"
+            error={errors.emailStr}
+            onChangeText={v => updateForm('emailStr', v)}
+          />
 
-      <Input label="House No / Plot No *" value={form.houseNo} onChange={v => set("houseNo", v)} />
-      <Input label="Street *" value={form.street} onChange={v => set("street", v)} />
-      <Input label="Area *" value={form.area} onChange={v => set("area", v)} />
-      <Input label="City *" value={form.city} onChange={v => set("city", v)} />
-      <Input label="State *" value={form.state} onChange={v => set("state", v)} />
-      <Input label="ZIP Code *" value={form.zip} onChange={v => set("zip", v)} />
+          {/* PRACTICE */}
+          <DropdownField
+            label="Stream of Practice *"
+            value={form.practiceId}
+            options={dropdowns.streams}
+            error={errors.practiceId}
+            openDropdown={openDropdown === 'practice'}
+            onToggle={() =>
+              setOpenDropdown(openDropdown === 'practice' ? null : 'practice')
+            }
+            onSelect={value => updateForm('practiceId', value)}
+            placeholder="Select practice stream"
+          />
 
-      <Input label="GST Number" value={form.gst} onChange={v => set("gst", v)} />
+          <DropdownField
+            label="Speciality *"
+            value={form.specialityId}
+            options={dropdowns.specialities}
+            error={errors.specialityId}
+            openDropdown={openDropdown === 'speciality'}
+            onToggle={() =>
+              setOpenDropdown(openDropdown === 'speciality' ? null : 'speciality')
+            }
+            onSelect={value => updateForm('specialityId', value)}
+            placeholder="Select speciality"
+            disabled={!form.practiceId}
+          />
 
-      <View style={styles.actions}>
-        <Pressable onPress={onBack} style={styles.back}>
-          <Text style={styles.backText}>Back</Text>
-        </Pressable>
+          {/* ADDRESS */}
+          <DropdownField
+            label="State *"
+            value={form.state}
+            options={dropdowns.states.map(s => ({
+              value: s.key,
+              label: s.name,
+            }))}
+            error={errors.state}
+            openDropdown={openDropdown === 'state'}
+            onToggle={() =>
+              setOpenDropdown(openDropdown === 'state' ? null : 'state')
+            }
+            onSelect={value => updateForm('state', value)}
+          />
 
-        <Pressable onPress={submit} style={styles.submit}>
-          <Text style={styles.submitText}>Submit</Text>
-        </Pressable>
-      </View>
+          <InputField
+            label="City *"
+            value={form.city}
+            error={errors.city}
+            onChangeText={v => updateForm('city', v)}
+          />
 
-      <Pressable onPress={onClose}>
-        <Text style={styles.close}>Cancel</Text>
-      </Pressable>
-    </ScrollView>
-  );
-}
+          <InputField
+            label="Street Address *"
+            value={form.street}
+            error={errors.street}
+            onChangeText={v => updateForm('street', v)}
+          />
 
-/* INPUT */
-function Input({ label, value, onChange }) {
-  return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput value={value} onChangeText={onChange} style={styles.input} />
+          <InputField
+            label="ZIP Code *"
+            value={form.zipCode}
+            keyboardType="numeric"
+            maxLength={6}
+            error={errors.zipCode}
+            onChangeText={v => updateForm('zipCode', v)}
+          />
+
+          {/* SUBMIT */}
+          <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+            <Text style={styles.submitText}>Submit Pre-Order Form</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
-/* STYLES */
+/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-  title: { fontSize: 18, fontWeight: "700", textAlign: "center" },
-  category: { textAlign: "center", color: "#2563EB", marginBottom: 14 },
-  label: { fontSize: 12, color: "#64748B" },
-  input: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+  screen: {
+    flex: 1,                    // Full screen height
+    backgroundColor: '#F8FAFC',
   },
-  actions: { flexDirection: "row", marginTop: 16 },
-  back: { flex: 1, padding: 14, backgroundColor: "#E5E7EB", marginRight: 8 },
-  submit: { flex: 1, padding: 14, backgroundColor: "#2563EB" },
-  backText: { textAlign: "center", fontWeight: "600" },
-  submitText: { textAlign: "center", color: "#fff", fontWeight: "600" },
-  close: { textAlign: "center", marginTop: 18, color: "#EF4444" },
+  keyboard: {
+    flex: 1,                    // Full keyboard height
+  },
+  scrollContent: {
+    padding: 20,                // Matches your old perfect padding
+    paddingBottom: 120,         // Space for submit + keyboard
+    flexGrow: 1,               
+    justifyContent: 'flex-start',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 28,
+    color: '#0F172A',
+    paddingTop: 10,
+  },
+  submitBtn: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 18,
+    borderRadius: 12,
+    marginTop: 32,
+    marginBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
 });

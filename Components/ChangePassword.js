@@ -58,6 +58,7 @@ function ChangePassword({ onClose }) {
         {/* Inputs */}
         <TextInput
           placeholder="Current password"
+          placeholderTextColor="#9CA3AF"
           secureTextEntry
           style={styles.input}
           onChangeText={setOldPassword}
@@ -65,6 +66,7 @@ function ChangePassword({ onClose }) {
 
         <TextInput
           placeholder="New password"
+          placeholderTextColor="#9CA3AF"
           secureTextEntry
           style={styles.input}
           onChangeText={setNewPassword}
