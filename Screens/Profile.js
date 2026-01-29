@@ -13,7 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChangePassword from "../Components/ChangePassword";
 
 function Profile() {
+  
   const { user } = useContext(AuthContext);
+
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   if (!user) {

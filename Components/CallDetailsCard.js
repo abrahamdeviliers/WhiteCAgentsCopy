@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Modal,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import InterestFlow from "./IntrestFlow";
 
 export default function CallDetailsCard({ data }) {
-  const [open, setOpen] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showInterest, setShowInterest] = useState(false);
 
   const initials = data.name
     .split(" ")
-    .map((w) => w[0])
+    .map(w => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
@@ -16,7 +24,7 @@ export default function CallDetailsCard({ data }) {
   return (
     <>
       {/* -------- ROW CARD -------- */}
-      <Pressable style={styles.rowCard} onPress={() => setOpen(true)}>
+      <Pressable style={styles.rowCard} onPress={() => setShowDetails(true)}>
         <View style={styles.middle}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials}</Text>
@@ -24,21 +32,33 @@ export default function CallDetailsCard({ data }) {
 
           <View>
             <Text style={styles.name}>{data.name}</Text>
-            <Text style={styles.subText}>{data.type} call</Text>
+            <Text style={styles.subText}>{data.callPurpose}</Text>
           </View>
         </View>
 
-        <Ionicons name="information-circle-outline" size={22} />
+        <Ionicons
+          name="information-circle-outline"
+          size={22}
+          color="#64748B"
+        />
       </Pressable>
 
-      {/* -------- MODAL -------- */}
-      <Modal visible={open} transparent animationType="fade">
+      {/* -------- DETAILS MODAL -------- */}
+      <Modal visible={showDetails} transparent animationType="fade">
         <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
           <Pressable
             style={styles.modalOverlay}
-            onPress={() => setOpen(false)}
+            onPress={() => setShowDetails(false)}
           >
-            <View style={styles.modalCard}>
+            <Pressable style={styles.modalCard}>
+              {/* CLOSE BUTTON */}
+              <Pressable
+                style={styles.closeBtn}
+                onPress={() => setShowDetails(false)}
+              >
+                <Ionicons name="close" size={22} color="#000000" />
+              </Pressable>
+
               <Text style={styles.modalTitle}>Call Details</Text>
 
               <Detail label="Name" value={data.name} />
@@ -49,12 +69,43 @@ export default function CallDetailsCard({ data }) {
               <Detail label="Call Result" value={data.callResult} />
               <Detail label="Doctor ID" value={data.doctorId} />
               <Detail label="Practice" value={data.practiceName} />
-              
-            </View>
+
+              <View style={styles.divider} />
+
+              <Pressable
+                style={styles.interestBtn}
+                onPress={() => {
+                  setShowDetails(false);
+                  setShowInterest(true);
+                }}
+              >
+                <Ionicons name="star-outline" size={18} color="#fff" />
+                <Text style={styles.interestText}>Set Interest</Text>
+              </Pressable>
+            </Pressable>
           </Pressable>
         </BlurView>
       </Modal>
-      
+
+      {/* -------- INTEREST FLOW MODAL -------- */}
+      <Modal visible={showInterest} transparent animationType="fade">
+        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
+          <View style={styles.modalOverlay}>
+            {/* CLOSE BUTTON */}
+            <Pressable
+              style={styles.closeBtnFloating}
+              onPress={() => setShowInterest(false)}
+            >
+              <Ionicons name="close" size={26} color="#fff" />
+            </Pressable>
+
+            <InterestFlow
+              data={data}
+              onClose={() => setShowInterest(false)}
+            />
+          </View>
+        </BlurView>
+      </Modal>
     </>
   );
 }
@@ -69,7 +120,7 @@ function Detail({ label, value }) {
   );
 }
 
-/* -------- STYLES (SELF-CONTAINED) -------- */
+/* -------- STYLES -------- */
 const styles = StyleSheet.create({
   rowCard: {
     backgroundColor: "#fff",
@@ -78,6 +129,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
 
   middle: {
@@ -102,11 +154,14 @@ const styles = StyleSheet.create({
 
   name: {
     fontWeight: "600",
+    fontSize: 15,
+    color: "#0F172A",
   },
 
   subText: {
     fontSize: 12,
     color: "#64748B",
+    marginTop: 2,
   },
 
   modalOverlay: {
@@ -122,10 +177,26 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
+  closeBtn: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 10,
+    color : 'black',
+    backgroundColor: "#fff",
+  },
+
+  closeBtnFloating: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 20,
+  },
+
   modalTitle: {
     fontSize: 17,
     fontWeight: "700",
-    marginBottom: 12,
+    marginBottom: 14,
     textAlign: "center",
   },
 
@@ -137,9 +208,34 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     color: "#64748B",
+    fontSize: 13,
   },
 
   detailValue: {
     fontWeight: "500",
+    maxWidth: "55%",
+    textAlign: "right",
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
+    marginVertical: 16,
+  },
+
+  interestBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2563EB",
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+
+  interestText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 8,
+    fontSize: 15,
   },
 });

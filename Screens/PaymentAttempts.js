@@ -115,7 +115,7 @@ function PaymentAttempts() {
         onRequestClose={() => setShowModal(false)}
         presentationStyle="fullScreen"
       >
-        <SafeAreaView style={{ flex: 1, marginTop: 10 }}
+        <SafeAreaView style={{ flex: 1, marginTop: 20 }}
     edges={['top', 'left', 'right']}>
         <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
           <View style={styles.modalHeader}>
