@@ -135,7 +135,7 @@ export default function CallDetailsCard({ data }) {
             >
               <Ionicons name="close" size={26} color="#fff" />
             </Pressable>
-            <BottomSheetModal onClose={() => setShowInterestFlow(false)}>
+            <BottomSheetModal onClose={() => setShowInterest(false)}>
               <InterestFlow
                 leadData={data} 
                 planData={planData}

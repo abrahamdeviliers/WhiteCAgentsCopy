@@ -7,13 +7,11 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  Alert,
   Linking,
-  Modal
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import UploadFileModal from "./subscribedcomp/UploadFileModal";
-
 
 if (Platform.OS === "android") {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -29,24 +27,19 @@ export default function ExpandableCard({
   onDelete,
   onInfo,
   invoiceURL,
-  showUpload = false, 
+  showUpload = false,
   showInterest = false,
-  onInterestPress,  
+  onInterestPress,
+  showSubscribe = false,
+  onSubscribePress,
 }) {
   const [open, setOpen] = useState(false);
-
-  // ✅ hooks INSIDE component
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setOpen(!open);
-  };
-
-  const handleDownload = async () => {
-    if (!preOrderFormPath) return;
-    Linking.openURL(preOrderFormPath);
   };
 
   function Row({ label, value }) {
@@ -86,46 +79,75 @@ export default function ExpandableCard({
                 <Row key={index} {...row} />
               ))}
 
-              {/* ACTIONS */}
-              {showUpload && (
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={styles.uploadBtn}
-                    onPress={() => setShowUploadModal(true)}
-                  >
-                    <Text style={styles.actionText}>Upload</Text>
-                  </TouchableOpacity>
-
-                  {uploadedFile && (
+              {/* ACTION BUTTONS */}
+              <View style={styles.actions}>
+                {showUpload && (
+                  <>
                     <TouchableOpacity
-                      style={styles.downloadBtnSmall}
-                      onPress={() => Linking.openURL(uploadedFile.uri)}
+                      style={styles.uploadBtn}
+                      onPress={() => setShowUploadModal(true)}
                     >
-                      <Text style={styles.actionText}>Download</Text>
+                      <Text style={styles.actionText}>Upload</Text>
                     </TouchableOpacity>
-                  )}
-                </View>
-              )}
 
-              {showInterest && (
-                <TouchableOpacity
-                  style={styles.interestBtn}
-                  onPress={onInterestPress}
-                >
-                  <Text style={styles.interestText}> Set Interested</Text>
-                </TouchableOpacity>
-              )}
-              {invoiceURL && (
-                <TouchableOpacity
-                  style={styles.downloadBtn}
-                  onPress={() => Linking.openURL(invoiceURL)}
-                >
-                  <Ionicons name="download-outline" size={18} color="#fff" />
-                  <Text style={styles.downloadText}>Download Invoice</Text>
-                </TouchableOpacity>
-              )}
+                    {uploadedFile && (
+                      <TouchableOpacity
+                        style={styles.downloadBtnSmall}
+                        onPress={() => Linking.openURL(uploadedFile.uri)}
+                      >
+                        <Text style={styles.actionText}>Download</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
 
-              {/* FILE NAME */}
+                {showInterest && (
+                  <TouchableOpacity
+                    style={styles.interestBtn}
+                    onPress={onInterestPress}
+                  >
+                    <Text style={styles.interestText}>Set Interested</Text>
+                  </TouchableOpacity>
+                )}
+
+                {showSubscribe && (
+                  <TouchableOpacity
+                    style={styles.interestBtn}
+                    onPress={onSubscribePress}
+                  >
+                    <Text style={styles.interestText}>Subscribe</Text>
+                  </TouchableOpacity>
+                )}
+
+                {invoiceURL && (
+                  <TouchableOpacity
+                    style={styles.downloadBtn}
+                    onPress={() => Linking.openURL(invoiceURL)}
+                  >
+                    <Ionicons name="download-outline" size={18} color="#fff" />
+                    <Text style={styles.downloadText}>Download Invoice</Text>
+                  </TouchableOpacity>
+                )}
+                {preOrderFormPath && (
+                  <TouchableOpacity
+                    style={styles.downloadBtnSmall}
+                    onPress={() => Linking.openURL(preOrderFormPath)}
+                  >
+                    <Text style={styles.actionText}>Download Form</Text>
+                  </TouchableOpacity>
+                )}
+
+                {onDelete && (
+                  <TouchableOpacity
+                    style={styles.deleteBtn}
+                    onPress={onDelete}
+                  >
+                    <Text style={styles.deleteText}>Delete</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* UPLOADED FILE NAME */}
               {uploadedFile && (
                 <Text style={styles.fileName}>📄 {uploadedFile.name}</Text>
               )}
@@ -134,7 +156,7 @@ export default function ExpandableCard({
         </View>
       </TouchableOpacity>
 
-      {/* ✅ MODAL OUTSIDE CARD */}
+      {/* UPLOAD FILE MODAL */}
       <Modal
         visible={showUploadModal}
         animationType="slide"
@@ -150,11 +172,9 @@ export default function ExpandableCard({
   );
 }
 
-
-
 const styles = StyleSheet.create({
   card: {
-    marginTop : 20,
+    marginTop: 20,
     backgroundColor: "#fff",
     marginHorizontal: 16,
     marginBottom: 16,
@@ -218,72 +238,73 @@ const styles = StyleSheet.create({
     color: "#34495e",
   },
   actions: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  marginTop: 16,
-},
-
-downloadBtn: {
-  backgroundColor: "#2563EB",
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 10,
-},
-
-actionText: {
-  color: "#fff",
-  fontWeight: "600",
-  fontSize: 13,
-},
-
-deleteBtn: {
-  backgroundColor: "#FEE2E2",
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 10,
-},
-
-deleteText: {
-  color: "#B91C1C",
-  fontWeight: "600",
-  fontSize: 13,
-},
-uploadBtn: {
-  backgroundColor: "#16A34A",
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 10,
-},
-
-fileName: {
-  marginTop: 10,
-  fontSize: 12,
-  color: "#475569",
-},
-downloadBtn: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 16,
+    gap: 8,
+  },
+  uploadBtn: {
+    backgroundColor: "#16A34A",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  downloadBtnSmall: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  interestBtn: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  downloadBtn: {
     marginTop: 12,
     backgroundColor: "#2563EB",
     paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 8,
+    marginBottom: 8,
   },
   downloadText: {
     color: "#fff",
     fontWeight: "600",
     marginLeft: 6,
   },
-  interestBtn: {
-  backgroundColor: "#2563EB",
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 10,
-},
-
-interestText: {
-  color: "#fff",
-  fontWeight: "600",
-  fontSize: 13,
-},
+  deleteBtn: {
+    backgroundColor: "#FEE2E2",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  deleteText: {
+    color: "#B91C1C",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  actionText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  fileName: {
+    marginTop: 10,
+    fontSize: 12,
+    color: "#475569",
+  },
 });

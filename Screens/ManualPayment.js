@@ -3,6 +3,7 @@ import { useState } from "react"
 import TabBuuton from "../Components/TabButton"
 import SearchLead from "./search/SearchLead"
 import NewLead from "./NewLead"
+import SearchLeadDoc from "./ManualPayment/SearchLeadDoc"
 
 function ManualPayment(){
 
@@ -30,7 +31,7 @@ function ManualPayment(){
 
             <View style = { styles.content}>
 
-                {activeTab === 0 && <SearchLead />}
+                {activeTab === 0 && <SearchLeadDoc />}
 
                 {activeTab === 1 && <NewLead />}
 
