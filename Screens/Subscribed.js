@@ -52,6 +52,7 @@ function Subscribed(){
           badgeText={item.status}
           amount={`₹ ${item.amount.toLocaleString("en-IN")}`}
           invoiceURL={item.invoiceURL}
+          showUpload={true}
           rows={[
             { label: "Mobile No", value: item.mobileNo },
             { label: "Speciality", value: item.specialityName },

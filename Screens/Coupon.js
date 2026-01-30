@@ -6,6 +6,7 @@ import ExpandableCard from "../Components/ExpandableCard";
 
 function Coupon() {
   const { sessionToken } = useContext(AuthContext);
+  
   const [data, setData] = useState([]);
 
   useEffect(() => {

@@ -29,6 +29,9 @@ export default function ExpandableCard({
   onDelete,
   onInfo,
   invoiceURL,
+  showUpload = false, 
+  showInterest = false,
+  onInterestPress,  
 }) {
   const [open, setOpen] = useState(false);
 
@@ -84,26 +87,34 @@ export default function ExpandableCard({
               ))}
 
               {/* ACTIONS */}
-              <View style={styles.actions}>
-                {/* UPLOAD */}
-                <TouchableOpacity
-                  style={styles.uploadBtn}
-                  onPress={() => setShowUploadModal(true)}
-                >
-                  <Text style={styles.actionText}>Upload</Text>
-                </TouchableOpacity>
-
-                {/* DOWNLOAD */}
-                {uploadedFile && (
+              {showUpload && (
+                <View style={styles.actions}>
                   <TouchableOpacity
-                    style={styles.downloadBtn}
-                    onPress={() => Linking.openURL(uploadedFile.uri)}
+                    style={styles.uploadBtn}
+                    onPress={() => setShowUploadModal(true)}
                   >
-                    <Text style={styles.actionText}>Download</Text>
+                    <Text style={styles.actionText}>Upload</Text>
                   </TouchableOpacity>
-                )}
-              </View>
 
+                  {uploadedFile && (
+                    <TouchableOpacity
+                      style={styles.downloadBtnSmall}
+                      onPress={() => Linking.openURL(uploadedFile.uri)}
+                    >
+                      <Text style={styles.actionText}>Download</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
+              {showInterest && (
+                <TouchableOpacity
+                  style={styles.interestBtn}
+                  onPress={onInterestPress}
+                >
+                  <Text style={styles.interestText}> Set Interested</Text>
+                </TouchableOpacity>
+              )}
               {invoiceURL && (
                 <TouchableOpacity
                   style={styles.downloadBtn}
@@ -263,4 +274,16 @@ downloadBtn: {
     fontWeight: "600",
     marginLeft: 6,
   },
+  interestBtn: {
+  backgroundColor: "#2563EB",
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 10,
+},
+
+interestText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 13,
+},
 });
