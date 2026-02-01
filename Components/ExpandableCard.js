@@ -32,6 +32,8 @@ export default function ExpandableCard({
   onInterestPress,
   showSubscribe = false,
   onSubscribePress,
+  showReset = false,        
+  onResetPress,   
 }) {
   const [open, setOpen] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -119,6 +121,14 @@ export default function ExpandableCard({
                   </TouchableOpacity>
                 )}
 
+                {showReset && (
+                  <TouchableOpacity
+                    style={[styles.interestBtn, { backgroundColor: "#F59E0B" }]} // orange
+                    onPress={onResetPress}
+                  >
+                    <Text style={styles.interestText}>Reset</Text>
+                  </TouchableOpacity>
+                )}
                 {invoiceURL && (
                   <TouchableOpacity
                     style={styles.downloadBtn}
