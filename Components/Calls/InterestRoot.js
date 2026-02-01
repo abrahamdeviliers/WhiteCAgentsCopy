@@ -7,6 +7,7 @@ const CATEGORIES = ["B2C", "B2B", "B2D", "Premium"];
 
 export default function InterestRoot({
   leadData,
+   planData,
   dropdowns,
   onClose,
 }) {
@@ -86,7 +87,7 @@ export default function InterestRoot({
         </Pressable>
 
         <PreOrderForm
-          planData={{ category: selectedCategory }}
+           planData = { planData}
           leadData={leadData}
           dropdowns={dropdowns}
         />

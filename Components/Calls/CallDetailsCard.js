@@ -49,6 +49,7 @@ export default function CallDetailsCard({ data }) {
 
     // 🔥 SAVE FULL RESPONSE
     setPlanResponse(res.data);
+    setPlanData(res.data);
     setShowInterest(true);
 
   } catch (err) {
@@ -149,6 +150,7 @@ export default function CallDetailsCard({ data }) {
               <InterestRoot
                 onClose={() => setShowInterest(false)}
                 leadData={data}
+                planData = {planData}
                 dropdowns={dropdowns}
               />
             </BottomSheetModal>

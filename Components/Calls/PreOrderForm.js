@@ -14,7 +14,6 @@ export default function PreOrderForm({
   planData,
   leadData,
   dropdowns, // { streams, specialities, states, hospitalTypes }
-  // onSubmit,
   onPracticeChange,
 }) {
   const [form, setForm] = useState({
@@ -22,7 +21,7 @@ export default function PreOrderForm({
     lastName: "",
     mobileNo: "",
     emailStr: "",
-    gst: "",
+    gstNo: "", // Changed from 'gst' to 'gstNo'
     billingEntityName: "",
     alternateContactName: "",
     alternateContactNumber: "",
@@ -31,9 +30,17 @@ export default function PreOrderForm({
     specialityId: "",
     state: "",
     city: "",
+    housePlotNo: "", // Added new field
+    area: "", // Added new field
     street: "",
     zipCode: "",
     country: "India",
+    latitude: "",
+    longitude: "",
+    doctorId: "",
+    leadId: "",
+    agentId: "",
+    couponId: "",
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -49,18 +56,26 @@ export default function PreOrderForm({
       lastName: planData?.lastName || leadData?.lastName || "",
       mobileNo: planData?.mobileNo || leadData?.mobileNo || "",
       emailStr: planData?.emailStr || leadData?.emailStr || "",
-      gst: planData?.gst || "",
-      billingEntityName: planData?.billingEntityName || "",
-      alternateContactName: planData?.alternateContactName || "",
-      alternateContactNumber: planData?.alternateContactNumber || "",
-      typeOfHospitalClinic: planData?.typeOfHospitalClinic || "",
-      practiceId: planData?.practiceId || "",
-      specialityId: planData?.specialityId || "",
-      state: planData?.state || "",
-      city: planData?.city || "",
-      street: planData?.street || "",
-      zipCode: planData?.zipCode || "",
-      country: planData?.country || "India",
+      gstNo: planData?.gstNo || leadData?.gstNo || "", // Fixed
+      billingEntityName: planData?.billingEntityName || leadData?.billingEntityName || "",
+      alternateContactName: planData?.alternateContactName || leadData?.alternateContactName || "",
+      alternateContactNumber: planData?.alternateContactNumber || leadData?.alternateContactNumber || "",
+      typeOfHospitalClinic: planData?.typeOfHospitalClinic || leadData?.typeOfHospitalClinic || "",
+      practiceId: planData?.practiceId || leadData?.practiceId || "",
+      specialityId: planData?.specialityId || leadData?.specialityId || "",
+      state: planData?.state || leadData?.state || "",
+      city: planData?.city || leadData?.city || "",
+      housePlotNo: planData?.housePlotNo || leadData?.housePlotNo || "", // New
+      area: planData?.area || leadData?.area || "", // New
+      street: planData?.street || leadData?.street || "",
+      zipCode: planData?.zipCode || leadData?.zipCode || "",
+      country: planData?.country || leadData?.country || "India",
+      latitude: planData?.latitude || leadData?.latitude || "",
+      longitude: planData?.longitude || leadData?.longitude || "",
+      doctorId: planData?.doctorId || leadData?.doctorId || "",
+      leadId: planData?.leadId || leadData?.leadId || "",
+      agentId: planData?.agentId || leadData?.agentId || "",
+      couponId: planData?.couponId || leadData?.couponId || "",
     }));
   }, [planData, leadData]);
 
@@ -91,6 +106,8 @@ export default function PreOrderForm({
     if (!form.specialityId) e.specialityId = true;
     if (!form.state) e.state = true;
     if (!form.city) e.city = true;
+    if (!form.housePlotNo) e.housePlotNo = true; // Added validation
+    if (!form.area) e.area = true; // Added validation
     if (!form.street) e.street = true;
     if (!form.zipCode || form.zipCode.length !== 6) e.zipCode = true;
 
@@ -99,14 +116,20 @@ export default function PreOrderForm({
   };
 
   /* ---------------- SUBMIT ---------------- */
-  // const handleSubmit = () => {
-  //   if (!validateForm()) return;
-  //   onSubmit(form);
-  // };
+  const handleSubmit = () => {
+    if (!validateForm()) return;
+    console.log("Form Data:", form);
+    // Add your submit logic here
+  };
 
   /* ---------------- UI ---------------- */
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView 
+    style={styles.container} 
+    contentContainerStyle={{ paddingBottom: 40 }} 
+    keyboardShouldPersistTaps="handled"
+    nestedScrollEnabled
+    >
       {/* TITLE */}
       <Text style={styles.title}>Pre-Order Information</Text>
 
@@ -141,9 +164,11 @@ export default function PreOrderForm({
           onChangeText={(v) => updateForm("emailStr", v)}
         />
         <InputField
-          label="GST"
-          value={form.gst}
-          onChangeText={(v) => updateForm("gst", v)}
+          label="GST Number"
+          value={form.gstNo}
+          onChangeText={(v) => updateForm("gstNo", v)}
+          maxLength={15}
+          placeholder="09AAACH7409R1ZZ"
         />
         <InputField
           label="Alternate Contact Name"
@@ -181,7 +206,7 @@ export default function PreOrderForm({
         />
         <DropdownField
           label="Stream of Practice *"
-          value={form.practiceId}
+          // value={form.practiceId}
           options={dropdowns.streams}
           error={errors.practiceId}
           openDropdown={openDropdown === "practice"}
@@ -192,7 +217,7 @@ export default function PreOrderForm({
         />
         <DropdownField
           label="Speciality *"
-          value={form.specialityId}
+          // value={form.specialityId}
           options={dropdowns.specialities}
           error={errors.specialityId}
           openDropdown={openDropdown === "speciality"}
@@ -207,10 +232,30 @@ export default function PreOrderForm({
       {/* ADDRESS */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Address</Text>
+        <InputField
+          label="House/Plot Number *"
+          value={form.housePlotNo}
+          error={errors.housePlotNo}
+          onChangeText={(v) => updateForm("housePlotNo", v)}
+          placeholder="10-111"
+        />
+        <InputField
+          label="Area *"
+          value={form.area}
+          error={errors.area}
+          onChangeText={(v) => updateForm("area", v)}
+          placeholder="Test Area"
+        />
+        <InputField
+          label="Street Address *"
+          value={form.street}
+          error={errors.street}
+          onChangeText={(v) => updateForm("street", v)}
+        />
         <DropdownField
           label="State *"
           value={form.state}
-          options={dropdowns.states} // Already in { value, label } format
+          options={dropdowns.states}
           error={errors.state}
           openDropdown={openDropdown === "state"}
           onToggle={() =>
@@ -225,12 +270,6 @@ export default function PreOrderForm({
           onChangeText={(v) => updateForm("city", v)}
         />
         <InputField
-          label="Street Address *"
-          value={form.street}
-          error={errors.street}
-          onChangeText={(v) => updateForm("street", v)}
-        />
-        <InputField
           label="ZIP Code *"
           value={form.zipCode}
           keyboardType="numeric"
@@ -238,10 +277,45 @@ export default function PreOrderForm({
           error={errors.zipCode}
           onChangeText={(v) => updateForm("zipCode", v)}
         />
+        <InputField
+          label="Country"
+          value={form.country}
+          onChangeText={(v) => updateForm("country", v)}
+          editable={false}
+        />
+      </View>
+
+      {/* LOCATION COORDINATES - Optional/Hidden */}
+      {(form.latitude || form.longitude) && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Location Coordinates</Text>
+          <InputField
+            label="Latitude"
+            value={form.latitude}
+            keyboardType="numeric"
+            onChangeText={(v) => updateForm("latitude", v)}
+            editable={false}
+          />
+          <InputField
+            label="Longitude"
+            value={form.longitude}
+            keyboardType="numeric"
+            onChangeText={(v) => updateForm("longitude", v)}
+            editable={false}
+          />
+        </View>
+      )}
+
+      {/* HIDDEN IDs - For submission */}
+      <View style={{ display: 'none' }}>
+        <Text>Doctor ID: {form.doctorId}</Text>
+        <Text>Lead ID: {form.leadId}</Text>
+        <Text>Agent ID: {form.agentId}</Text>
+        <Text>Coupon ID: {form.couponId}</Text>
       </View>
 
       {/* SUBMIT */}
-      <TouchableOpacity style={styles.submitBtn}>
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
         <Text style={styles.submitText}>Submit Pre-Order</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -249,11 +323,13 @@ export default function PreOrderForm({
 }
 
 /* ---------------- STYLES ---------------- */
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 16,
   },
+
   title: {
     fontSize: 20,
     fontWeight: "700",
@@ -261,18 +337,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 24,
   },
+
   section: {
     marginBottom: 28,
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
   },
+
   sectionTitle: {
     fontSize: 15,
     fontWeight: "600",
     color: "#475569",
     marginBottom: 14,
   },
+
   submitBtn: {
     backgroundColor: "#2563EB",
     paddingVertical: 18,
@@ -285,6 +364,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
+
   submitText: {
     color: "#FFFFFF",
     fontSize: 16,

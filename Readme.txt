@@ -1026,3 +1026,6 @@ npm install @react-native-async-storage/async-storage
 
 
 expo install expo-document-picker Use expo-document-picker for upload
+
+
+git remote set-url origin https://github.com/abrahamdeviliers/WhiteCAgentsCopy.git
