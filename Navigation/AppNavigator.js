@@ -1,90 +1,109 @@
-import { NavigationContainer , getFocusedRouteNameFromRoute} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LoginScreen from '../Screens/LoginScreen';
-import Dashboard from '../Screens/Dashboard';
-import BottomTabs from './BottomTabs';
-import Intrested from '../Screens/Intrested';
-import AgentCancelled from '../Screens/AgentCancelled';
-import SimpleTabs from '../Screens/search/SimpleTabs';
-import Subscribed from '../Screens/Subscribed';
-import RejectedSubscription from '../Screens/RejectedSubscription';
-import Coupon from '../Screens/Coupon';
-import Renewels from '../Screens/Renewels';
-import ManualPayment from '../Screens/ManualPayment';
-import Profile from '../Screens/Profile';
-import NewLead from '../Screens/NewLead';
-const stack = createNativeStackNavigator()
+import React, { useContext } from "react";
+import {
+  NavigationContainer,
+  getFocusedRouteNameFromRoute,
+} from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { View, ActivityIndicator } from "react-native";
 
-function getHeaderTitle(route){
+import { AuthContext } from "../Context/AuthContext";
 
-    const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+// Screens
+import LoginScreen from "../Screens/LoginScreen";
+import Dashboard from "../Screens/Dashboard";
+import BottomTabs from "./BottomTabs";
+import Intrested from "../Screens/Intrested";
+import AgentCancelled from "../Screens/AgentCancelled";
+import SimpleTabs from "../Screens/search/SimpleTabs";
+import Subscribed from "../Screens/Subscribed";
+import RejectedSubscription from "../Screens/RejectedSubscription";
+import Coupon from "../Screens/Coupon";
+import Renewels from "../Screens/Renewels";
+import ManualPayment from "../Screens/ManualPayment";
+import Profile from "../Screens/Profile";
+import NewLead from "../Screens/NewLead";
 
-    switch ( routeName ) {
+const Stack = createNativeStackNavigator();
 
-        case 'Home' :
-            return 'Dashboard'
-        case 'calls' :
-            return 'Calls History '
-        case 'Payment' : 
-            return 'Payments'
-        default :
-            return 'Dashboard'
-    }
+/* ---------- HEADER TITLE HANDLER ---------- */
+function getHeaderTitle(route) {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+
+  switch (routeName) {
+    case "Home":
+      return "Dashboard";
+    case "calls":
+      return "Calls History";
+    case "Payment":
+      return "Payments";
+    default:
+      return "Dashboard";
+  }
 }
 
-function AppNavigator(){
+/* ---------- APP NAVIGATOR ---------- */
+function AppNavigator() {
+  const { user, loading } = useContext(AuthContext);
 
+  // Show loader while restoring login
+  if (loading) {
     return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
-        <NavigationContainer>
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        {/* --------- NOT LOGGED IN --------- */}
+        {!user && (
+          <Stack.Screen
+            name="login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+        )}
 
-            <stack.Navigator>
-
-                <stack.Screen 
-                name='login'
-                component={ LoginScreen }
-                options={{headerShown : false}}
-                />
-
-                <stack.Screen 
-                name='Bottomtabs'
-                component={ BottomTabs }
-                options={({ route }) => ({
+        {/* --------- LOGGED IN --------- */}
+        {user && (
+          <>
+            <Stack.Screen
+              name="Bottomtabs"
+              component={BottomTabs}
+              options={({ route }) => ({
                 headerTitle: getHeaderTitle(route),
-                headerTitleAlign: 'center',
-                headerStyle: {
-                backgroundColor: '#fff',
-                },
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#fff" },
                 headerShadowVisible: false,
-                
-                })}
-                />
+              })}
+            />
 
-                <stack.Screen name="intrested" component={ Intrested }  />
-
-                <stack.Screen name="search" component={ SimpleTabs  }  />
-
-                <stack.Screen name="subscribed" component={  Subscribed  }  />
-
-                <stack.Screen name="RejectedSubscriptions" component={ RejectedSubscription } />
-
-                <stack.Screen name="Coupons"  component={ Coupon  }  />
-
-                <stack.Screen name="Renewals" component={ Renewels }  />
-
-                <stack.Screen name="AgentCancelled" component={ AgentCancelled }  />
-
-                <stack.Screen name="manualpayment" component={ ManualPayment  }  />
-
-                <stack.Screen name='profile' component={ Profile } />
-
-                <stack.Screen name='newlead' component={ NewLead } />
-
-            </stack.Navigator>
-
-        </NavigationContainer>
-
-    )
+            <Stack.Screen name="intrested" component={Intrested} />
+            <Stack.Screen name="search" component={SimpleTabs} />
+            <Stack.Screen name="subscribed" component={Subscribed} />
+            <Stack.Screen
+              name="RejectedSubscriptions"
+              component={RejectedSubscription}
+            />
+            <Stack.Screen name="Coupons" component={Coupon} />
+            <Stack.Screen name="Renewals" component={Renewels} />
+            <Stack.Screen
+              name="AgentCancelled"
+              component={AgentCancelled}
+            />
+            <Stack.Screen
+              name="manualpayment"
+              component={ManualPayment}
+            />
+            <Stack.Screen name="profile" component={Profile} />
+            <Stack.Screen name="newlead" component={NewLead} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
-export default AppNavigator
+export default AppNavigator;

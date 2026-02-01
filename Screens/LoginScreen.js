@@ -79,7 +79,29 @@ function LoginScreen( { navigation }){
             createdAt: agent.createdAt,
         })
 
-        navigation.replace("Bottomtabs");
+        await AsyncStorage.setItem("sessionToken", session_token);
+await AsyncStorage.setItem("user", JSON.stringify({
+  agentId: agent.agentId,
+  name: agent.name?.trim() || "",
+  email: agent.email,
+  mobileNo: agent.mobileNo,
+  designation: agent.designation,
+  internalEmpId: agent.internalEmpId,
+  countryCode: agent.countryCode,
+  createdAt: agent.createdAt,
+}));
+
+setSessionToken(session_token);
+setUser({
+  agentId: agent.agentId,
+  name: agent.name?.trim() || "",
+  email: agent.email,
+  mobileNo: agent.mobileNo,
+  designation: agent.designation,
+  internalEmpId: agent.internalEmpId,
+  countryCode: agent.countryCode,
+  createdAt: agent.createdAt,
+});
     } else {
     alert(response.data?.message || "Invalid credentials");
     }

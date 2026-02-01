@@ -3,12 +3,16 @@ import { Ionicons } from '@expo/vector-icons'
 import MenuItem from './MenuItem';
 import { confirmLogout } from '../utils/confirmLogout';
 import { useNavigation } from '@react-navigation/native';
+import { useContext } from 'react';
+import { AuthContext } from '../Context/AuthContext';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 function MoreMenu( { visible , onClose , onNavigate }){
 
     const navigation = useNavigation();
+
+    const { logout } = useContext(AuthContext);
 
     if (!visible) return ;
 
@@ -32,8 +36,8 @@ function MoreMenu( { visible , onClose , onNavigate }){
              label="Log Out"
              danger 
              onPress={() => {
-                onClose();
-                confirmLogout(navigation);
+                 onClose();
+                confirmLogout(navigation, logout);
             }}
               />
 
