@@ -10,6 +10,7 @@ import PaymentAttempts from './Screens/PaymentAttempts';
 import SimpleTabs from './Screens/search/SimpleTabs';
 import { AuthProvider } from './Context/AuthContext';
 import Calls from './Screens/Calls';
+import { PlanProvider } from './Context/PlanContext';
 
 export default function App() {
   return (
@@ -18,7 +19,12 @@ export default function App() {
 
         <AuthProvider>
 
-          <AppNavigator />
+          <PlanProvider>
+
+            <AppNavigator />
+
+          </PlanProvider>
+
           
         </AuthProvider>
   );

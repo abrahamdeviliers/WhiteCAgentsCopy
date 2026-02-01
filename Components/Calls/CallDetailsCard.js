@@ -12,11 +12,19 @@ import InterestFlow from "./IntrestFlow";
 import axios from 'axios'
 import { AuthContext } from "../../Context/AuthContext";
 import BottomSheetModal from "../BottomSheetModal";
+import { PlanContext } from "../../Context/PlanContext";
+import PlanSelectorFull from "./PlanSelectorFull";
+import PlanSelectorFullWrapper from "./PlanSelectorFullWrapper";
+import InterestRoot from "./InterestRoot";
+import { dropdowns } from "../../DropdownData/DropDownData";
+
 
 export default function CallDetailsCard({ data }) {
   const [showDetails, setShowDetails] = useState(false);
   const [showInterest, setShowInterest] = useState(false);
   const [planData , setPlanData] = useState(null)
+
+  const { setPlanResponse } = useContext(PlanContext);
 
   const { sessionToken }  = useContext(AuthContext)
 
@@ -24,8 +32,6 @@ export default function CallDetailsCard({ data }) {
 
  async function fetchPlanData() {
   try {
-    console.log("Calling planListing API...");
-
     const res = await axios.post(
       "https://svcdev.whitecoats.com/agent/planListing",
       {
@@ -35,21 +41,22 @@ export default function CallDetailsCard({ data }) {
         showAllPlans: false,
       },
       {
-        headers : {
-          Authorization : `Bearer ${sessionToken}`
-        }
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
       }
     );
 
-    console.log("PLAN API RESPONSE:", res.data);
-
-    const apiData = res.data?.data || {};
-    setPlanData(res.data);
+    // 🔥 SAVE FULL RESPONSE
+    setPlanResponse(res.data);
     setShowInterest(true);
+
   } catch (err) {
-    console.log("PLAN API ERROR:", err?.response || err);
+    console.log("PLAN API ERROR:", err);
   }
 }
+
+
 
   const initials = data.name
     .split(" ")
@@ -136,10 +143,13 @@ export default function CallDetailsCard({ data }) {
               <Ionicons name="close" size={26} color="#fff" />
             </Pressable>
             <BottomSheetModal onClose={() => setShowInterest(false)}>
-              <InterestFlow
-                leadData={data} 
-                planData={planData}
+              {/* <PlanSelectorFullWrapper
                 onClose={() => setShowInterest(false)}
+              /> */}
+              <InterestRoot
+                onClose={() => setShowInterest(false)}
+                leadData={data}
+                dropdowns={dropdowns}
               />
             </BottomSheetModal>
           </View>

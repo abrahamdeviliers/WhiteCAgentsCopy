@@ -1,123 +1,163 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import axios from 'axios';
-import OptionSelector from "./OptionSelector";
-import PlanSelector from "./PlanSelector";
-import PreOrderForm from "./PreOrderForm";
-import { dropdowns } from "../../DropdownData/DropDownData";
+import React, { useContext, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
-export default function InterestFlow({ leadData, planData, sessionToken, onClose }) {
-  const [step, setStep] = useState("DETAILS");
-  const [category, setCategory] = useState(null);
-  
+import { PlanContext } from "../../Context/PlanContext";
 
-  const [showInterestFlow, setShowInterestFlow] = useState(false);
+export default function AgentInterestFlow({
+  category,     // "B2C" | "B2B" | "B2D" | "Premium"
+  onBack,
+  onClose,
+}) {
+  const { planResponse } = useContext(PlanContext);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  // 🔥 CORE LOGIC: category → plans
+  const plansForCategory = useMemo(() => {
+    if (!planResponse?.planCategory) return [];
+
+    const categoryObj = planResponse.planCategory.find(
+      (c) => c.categoryName === category
+    );
+
+    return categoryObj?.plan || [];
+  }, [planResponse, category]);
 
   return (
     <View style={styles.container}>
-      {step === "DETAILS" && (
-        <>
-          <Text style={styles.header}>Set Interest</Text>
+      <Text style={styles.header}>{category} Plans</Text>
 
-          <Pressable
-            style={styles.card}
-            onPress={() => setStep("PRE_ORDER_TYPE")}
-          >
-            <Text style={styles.cardText}>Pre Order Form Details</Text>
-          </Pressable>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        {plansForCategory.map((plan) => {
+          const pricing = plan.planPricing?.[0] || {};
+          const total =
+            Number(pricing.amount || 0) +
+            Number(pricing.gstAmount || 0);
 
-          <Pressable
-            style={styles.card}
-            onPress={() => setStep("AGENT_TYPE")}
-          >
-            <Text style={styles.cardText}>
-              Agent Interested Update Limit
-            </Text>
-          </Pressable>
+          return (
+            <Pressable
+              key={plan.planId}
+              style={[
+                styles.planCard,
+                selectedPlan?.planId === plan.planId &&
+                  styles.selected,
+              ]}
+              onPress={() => setSelectedPlan(plan)}
+            >
+              <Text style={styles.planName}>{plan.planName}</Text>
 
-          <Pressable onPress={onClose}>
-            <Text style={styles.back}>Close</Text>
-          </Pressable>
-        </>
-      )}
+              <Text style={styles.price}>
+                ₹ {pricing.amount} + GST ({pricing.gstAmount})
+              </Text>
 
-      {step === "PRE_ORDER_TYPE" && (
-        <OptionSelector
-          title="Pre Order Form Details"
-          onSelect={opt => {
-            setCategory(opt);
-            setStep("PRE_ORDER_FORM");
-          }}
-          onBack={() => setStep("DETAILS")}
-        />
-      )}
+              <Text style={styles.total}>
+                Total: ₹ {total}
+              </Text>
+            </Pressable>
+          );
+        })}
 
-      {step === "PRE_ORDER_FORM" && planData && (
-        <PreOrderForm
-          category={category}
-          leadData={leadData}
-          planData={planData}
-          dropdowns={dropdowns}           // ✅ Pass dropdowns
-          sessionToken={sessionToken}     // ✅ Pass token
-          onBack={() => setStep("PRE_ORDER_TYPE")}       // ✅ Submit handler
-          onClose={onClose}
-        />
-      )}
+        {!plansForCategory.length && (
+          <Text style={styles.empty}>No plans available</Text>
+        )}
+      </ScrollView>
 
-      {step === "AGENT_TYPE" && (
-        <OptionSelector
-          title="Agent Interested Update Limit"
-          onSelect={opt => {
-            setCategory(opt);
-            setStep("PLAN");
-          }}
-          onBack={() => setStep("DETAILS")}
-        />
-      )}
+      {/* CONFIRM */}
+      <Pressable
+        style={[
+          styles.confirmBtn,
+          !selectedPlan && { opacity: 0.5 },
+        ]}
+        disabled={!selectedPlan}
+        onPress={() => {
+          console.log("SELECTED PLAN:", selectedPlan);
+          onClose();
+        }}
+      >
+        <Text style={styles.confirmText}>Confirm</Text>
+      </Pressable>
 
-      {step === "PLAN" && (
-        <PlanSelector
-          category={category}
-          leadData={leadData}
-          onBack={() => setStep("AGENT_TYPE")}
-          onConfirm={() => onClose()}
-        />
-      )}
+      {/* BACK */}
+      <Pressable onPress={onBack}>
+        <Text style={styles.back}>← Back</Text>
+      </Pressable>
     </View>
   );
 }
 
+/* ---------------- STYLES ---------------- */
+
 const styles = StyleSheet.create({
-  container: {               
-    backgroundColor: "#fff",
+  container: {
+    flex: 1,
     padding: 16,
-    borderRadius: 18,
-    width: "100%",              
   },
 
   header: {
     fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
-  card: {
-    padding: 16,
+  planCard: {
+    backgroundColor: "#F8FAFC",
+    padding: 14,
     borderRadius: 14,
-    backgroundColor: "#EFF6FF",
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
 
-  cardText: {
+  selected: {
+    borderColor: "#2563EB",
+    backgroundColor: "#EFF6FF",
+  },
+
+  planName: {
+    fontSize: 15,
     fontWeight: "600",
-    textAlign: "center",
+    marginBottom: 4,
+  },
+
+  price: {
+    fontSize: 14,
+    color: "#475569",
+  },
+
+  total: {
+    marginTop: 6,
+    fontWeight: "600",
+  },
+
+  confirmBtn: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  confirmText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
   },
 
   back: {
     textAlign: "center",
-    marginTop: 18,
+    marginTop: 14,
+    color: "#64748B",
+  },
+
+  empty: {
+    textAlign: "center",
+    marginTop: 40,
     color: "#64748B",
   },
 });
-
