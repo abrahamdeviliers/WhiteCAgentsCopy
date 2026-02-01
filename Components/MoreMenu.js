@@ -1,10 +1,14 @@
 import { View , Text , StyleSheet,TouchableOpacity , Pressable , Dimensions  } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import MenuItem from './MenuItem';
+import { confirmLogout } from '../utils/confirmLogout';
+import { useNavigation } from '@react-navigation/native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 function MoreMenu( { visible , onClose , onNavigate }){
+
+    const navigation = useNavigation();
 
     if (!visible) return ;
 
@@ -24,7 +28,14 @@ function MoreMenu( { visible , onClose , onNavigate }){
             <MenuItem icon='cash-outline'  label='Manual Payment'  onPress={ () => onNavigate('manualpayment')}  />
             <MenuItem icon='person-add-outline'  label='New lead'  onPress={ () => onNavigate('newlead')}  />
 
-            <MenuItem icon="log-out-outline" label="Log Out" danger />
+            <MenuItem icon="log-out-outline"
+             label="Log Out"
+             danger 
+             onPress={() => {
+                onClose();
+                confirmLogout(navigation);
+            }}
+              />
 
         </View>
         </>
