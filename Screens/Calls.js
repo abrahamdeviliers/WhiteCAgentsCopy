@@ -36,9 +36,9 @@ function Calls() {
         "https://svcdev.whitecoats.com/agent/getCallListing",
         {
           agentId: user.agentId,
-          // fromDate: filters.startDate,
-          // toDate: filters.endDate,
-          // mobile: filters.mobile,
+          fromDate: filters.startDate,
+          toDate: filters.endDate,
+          mobile: filters.mobile,
         },
         {
           headers: {

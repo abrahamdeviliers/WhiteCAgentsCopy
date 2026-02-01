@@ -44,6 +44,7 @@ function Renewels() {
         { headers: { Authorization: `Bearer ${sessionToken}` } }
       );
 
+      console.log("from renewels",res)
       setPlanData(res.data);
       setSelectedItem(item);
       setShowInterest(true);

@@ -10,15 +10,27 @@ function Subscribed(){
 
     const { sessionToken }  = useContext(AuthContext)
 
+    const [message, setMessage] = useState('');
+
+    const { user } = useContext(AuthContext)
+
+    const [filters, setFilters] = useState({
+        startDate: null,
+        endDate: null,
+        mobile: '',
+    });
+
     const [ data , setData] = useState([])
 
     async function getData(){
 
         let k = await axios.post('https://svcdev.whitecoats.com/agent/getSubscribedListing',
             {
-                "fromDate": "2025-01-01",
-                "toDate": "2026-01-31",
-                "agentId": 119
+                // "fromDate": "2025-01-01",
+                // "toDate": "2026-01-31",
+                agentId: user.agentId,
+                fromDate: filters.startDate,
+                toDate: filters.endDate,
             },
             {
                 headers : {
@@ -26,9 +38,14 @@ function Subscribed(){
                 }
             }
         )
-
         console.log(k.data)
-        setData(k.data.paymentAttempts)
+       if (k.data?.serviceResponse?.status === 'N') {
+        setData([]);
+        setMessage(k.data.serviceResponse.message);
+        } else {
+        setData(k.data.paymentAttempts || []);
+        setMessage('');
+        }
     }
 
     return(
@@ -38,9 +55,22 @@ function Subscribed(){
             showStartDate = {true}
             showEndDate = {true}
             showMobile = {true}
+            onStartDateChange={(val) =>
+            setFilters((prev) => ({ ...prev, startDate: val }))
+            }
+            onEndDateChange={(val) =>
+            setFilters((prev) => ({ ...prev, endDate: val }))
+            }
             onSubmit={getData}
             />
             
+            {message ? (
+            <View style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#666', fontSize: 16 }}>
+                {message}
+                </Text>
+            </View>
+            ) : null}
 
             {/* <Button title="Get Data" onPress={getData} /> */}
 

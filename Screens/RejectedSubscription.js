@@ -31,7 +31,7 @@ function RejectedSubscription() {
       const res = await axios.post(
         "https://svcdev.whitecoats.com/emp/getManualSubscribedRejectedListing",
         {
-          agentId: 119, // replace with dynamic agentId if needed
+          agentId: 119, 
           fromDate: filters.startDate,
           toDate: filters.endDate,
           mobileNo: filters.mobileNo || null,
@@ -39,7 +39,6 @@ function RejectedSubscription() {
         {
           headers: {
             Authorization: `Bearer ${sessionToken}`,
-            "Content-Type": "application/json",
           },
         }
       );

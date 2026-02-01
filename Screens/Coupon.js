@@ -43,8 +43,8 @@ function Coupon() {
           badgeText={item.status}
           amount={
             item.discountType === "PERCENT"
-              ? `${item.discountValue}% OFF`
-              : `₹ ${item.discountValue} OFF`
+              ? `${item.discountFixed}% OFF`
+              : ` ${item.discountPCT}% OFF`
           }
           rows={[
             { label: "Discount Type", value: item.discountType },

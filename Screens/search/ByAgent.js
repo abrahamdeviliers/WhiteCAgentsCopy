@@ -11,6 +11,12 @@ function ByAgent() {
 
   const [data, setData] = useState([])
 
+   const [filters, setFilters] = useState({
+    startDate: null,
+    endDate: null,
+    mobile: '',
+  });
+
   const [error, setError] = useState(null)
   
   const [loading, setLoading] = useState(false)
@@ -24,9 +30,11 @@ function ByAgent() {
       const res = await axios.post(
         'http://3.108.248.132:8090/WhiteCoatsCore/lead/getDisposition',
         {
-          fromDate: '2026-01-01',
-          toDate: '2026-01-31',
+          // fromDate: '2026-01-01',
+          // toDate: '2026-01-31',
           internalEmpId: '156',
+          fromDate: filters.startDate,
+          toDate: filters.endDate,
         },
         {
           headers: {
@@ -60,6 +68,12 @@ function ByAgent() {
         showStartDate
         showEndDate
         showAgentId
+        onStartDateChange={(val) =>
+          setFilters((prev) => ({ ...prev, startDate: val }))
+        }
+        onEndDateChange={(val) =>
+          setFilters((prev) => ({ ...prev, endDate: val }))
+        }
         onSubmit={getData}
       />
 
