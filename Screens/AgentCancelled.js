@@ -1,36 +1,50 @@
-import { View, FlatList, Modal , StyleSheet , TouchableOpacity , ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  FlatList,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import ExpandableCard from "../Components/ExpandableCard";
-import InterestFlow from "../Components/Calls/IntrestFlow";
-import { Ionicons } from "@expo/vector-icons";
+import InterestRoot from "../Components/Calls/InterestRoot"; // ✅ Changed to InterestRoot
 
 function AgentCancelled() {
   const { user, sessionToken } = useContext(AuthContext);
 
   const [data, setData] = useState([]);
-  const [showInterest, setShowInterest] = useState(false);
+  
+  // Step-based flow (exact Renewels pattern)
+  const [step, setStep] = useState("LIST"); // LIST | INTEREST_ROOT
   const [selectedItem, setSelectedItem] = useState(null);
   const [planData, setPlanData] = useState(null);
 
+  // Fetch cancelled renewals on mount
   useEffect(() => {
     if (!user?.agentId || !sessionToken) return;
 
     async function getData() {
-      const res = await axios.post(
-        "https://svcdev.whitecoats.com/agent/getRenewalListing",
-        { agentId: user.agentId, cancelled: true },
-        { headers: { Authorization: `Bearer ${sessionToken}` } }
-      );
-
-      setData(res.data.renewalListing || []);
+      try {
+        const res = await axios.post(
+          "https://svcdev.whitecoats.com/agent/getRenewalListing",
+          { agentId: user.agentId, cancelled: true },
+          { headers: { Authorization: `Bearer ${sessionToken}` } }
+        );
+        setData(res.data.renewalListing || []);
+        setStep("LIST"); // Ensure list view
+      } catch (err) {
+        console.log("Error fetching cancelled renewals:", err);
+      }
     }
 
     getData();
   }, [user, sessionToken]);
 
-  async function fetchPlanData(item) {
+  async function handleSetInterest(item) {
     try {
       const res = await axios.post(
         "https://svcdev.whitecoats.com/agent/planListing",
@@ -45,24 +59,26 @@ function AgentCancelled() {
 
       setPlanData(res.data);
       setSelectedItem(item);
-      setShowInterest(true);
+      setStep("INTEREST_ROOT"); // ✅ Switch to InterestRoot (no modal needed)
     } catch (err) {
       console.log("PLAN API ERROR:", err);
     }
   }
 
-  return (
-    <>
+  /* ---------------- STEP 1: CANCELLED RENEWALS LIST ---------------- */
+  if (step === "LIST") {
+    return (
       <FlatList
         data={data}
         keyExtractor={item => String(item.subscriptionId)}
+        contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
           <ExpandableCard
             header={item.planName}
             subHeader={`Valid till ${item.endDate}`}
             badgeText="Cancelled"
-            showInterest
-            onInterestPress={() => fetchPlanData(item)}
+            showInterest={true} // ✅ Enable interest button
+            onInterestPress={() => handleSetInterest(item)} // ✅ Opens InterestRoot
             rows={[
               { label: "Subscription ID", value: item.subscriptionId },
               { label: "Doctor ID", value: item.doctorId },
@@ -72,76 +88,20 @@ function AgentCancelled() {
           />
         )}
       />
+    );
+  }
 
-      {/* INTEREST FLOW MODAL */}
-     {/* INTEREST FLOW MODAL */}
-<Modal
-  visible={showInterest}
-  transparent
-  animationType="slide"
-  onRequestClose={() => setShowInterest(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      {/* Close button */}
-      <TouchableOpacity
-        style={styles.closeBtn}
-        onPress={() => setShowInterest(false)}
-      >
-        <Ionicons name="close" size={22} color="#0F172A" />
-      </TouchableOpacity>
-
-      {/* Scrollable content */}
-      <ScrollView
-        contentContainerStyle={{ paddingTop: 40, paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {selectedItem && (
-          <InterestFlow
-            leadData={selectedItem}
-            planData={planData}
-            sessionToken={sessionToken}
-            onClose={() => setShowInterest(false)}
-          />
-        )}
-      </ScrollView>
+  /* ---------------- STEP 2: INTEREST ROOT (handles its own flow) ---------------- */
+  return (
+    <View style={{ flex: 1 }}>
+      <InterestRoot
+        leadData={selectedItem}
+        planData={planData}
+        dropdowns={{}} // Add dropdowns if needed
+        onClose={() => setStep("LIST")} // ✅ Back to cancelled renewals list
+      />
     </View>
-  </View>
-</Modal>
-
-
-    </>
   );
 }
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",   // 👈 bottom sheet style
-  },
-
-  modalContainer: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    padding: 16,
-    maxHeight: "90%",            // 👈 scroll-safe
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 12,
-  },
-
-  closeBtn: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    zIndex: 10,
-    backgroundColor: "#F1F5F9",
-    borderRadius: 20,
-    padding: 6,
-  },
-});
 
 export default AgentCancelled;

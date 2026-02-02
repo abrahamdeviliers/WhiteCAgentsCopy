@@ -17,7 +17,6 @@ function RejectedSubscription() {
     mobileNo: "", // optional filter
   });
 
-  // Fetch Rejected Subscriptions
   const getRejectedSubscriptions = async () => {
     if (!filters.startDate || !filters.endDate) {
       Alert.alert("Error", "Please select both start and end dates.");
@@ -31,7 +30,7 @@ function RejectedSubscription() {
       const res = await axios.post(
         "https://svcdev.whitecoats.com/emp/getManualSubscribedRejectedListing",
         {
-          agentId: 119, 
+          agentId: user.agentId, 
           fromDate: filters.startDate,
           toDate: filters.endDate,
           mobileNo: filters.mobileNo || null,

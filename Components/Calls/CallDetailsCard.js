@@ -57,8 +57,6 @@ export default function CallDetailsCard({ data }) {
   }
 }
 
-
-
   const initials = data.name
     .split(" ")
     .map(w => w[0])

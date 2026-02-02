@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { PlanContext } from "../../Context/PlanContext"; // ✅ Add PlanContext
 import PlanSelectorFullWrapper from "./PlanSelectorFullWrapper";
 import PreOrderForm from "./PreOrderForm";
 
@@ -7,7 +8,7 @@ const CATEGORIES = ["B2C", "B2B", "B2D", "Premium"];
 
 export default function InterestRoot({
   leadData,
-   planData,
+  planData,
   dropdowns,
   onClose,
 }) {
@@ -15,6 +16,14 @@ export default function InterestRoot({
   // CHOICE | AGENT_LIMIT | PREORDER_CATEGORY | PREORDER_FORM
 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const { setPlanResponse } = useContext(PlanContext); 
+  // ✅ Sync planData prop to PlanContext when component mounts
+  useEffect(() => {
+    if (planData?.planCategory) {
+      console.log("🔄 InterestRoot: Syncing planData to PlanContext");
+      setPlanResponse(planData);
+    }
+  }, [planData, setPlanResponse]);
 
   /* ---------------- CHOICE ---------------- */
   if (step === "CHOICE") {
@@ -42,10 +51,13 @@ export default function InterestRoot({
   /* ---------------- AGENT LIMIT ---------------- */
   if (step === "AGENT_LIMIT") {
     return (
-      <PlanSelectorFullWrapper
-        onClose={onClose}
-        onBack={() => setStep("CHOICE")}
-      />
+      <View style={{flex: 1}}>
+        {/* ✅ PlanContext is now populated, PlanSelectorFullWrapper will render */}
+        <PlanSelectorFullWrapper
+          onClose={onClose}
+          onBack={() => setStep("CHOICE")}
+        />
+      </View>
     );
   }
 
@@ -87,7 +99,7 @@ export default function InterestRoot({
         </Pressable>
 
         <PreOrderForm
-           planData = { planData}
+          planData={planData}
           leadData={leadData}
           dropdowns={dropdowns}
         />
@@ -97,6 +109,7 @@ export default function InterestRoot({
 
   return null;
 }
+
 const styles = StyleSheet.create({
   container: {
     padding: 16,

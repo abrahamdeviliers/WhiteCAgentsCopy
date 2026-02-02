@@ -1,37 +1,109 @@
 import axios from 'axios';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList , ScrollView } from 'react-native';
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  StyleSheet,
+  ActivityIndicator
+} from 'react-native';
 import DateRangePicker from '../../Components/DateRangePicker';
 import ExpandableCard from '../../Components/ExpandableCard';
-import InterestFlow from '../../Components/Calls/IntrestFlow';
+import InterestRoot from '../../Components/Calls/InterestRoot'; // ✅ Changed to InterestRoot
 import { Ionicons } from '@expo/vector-icons';
+
 
 function SearchLeadDoc() {
   const { sessionToken, user } = useContext(AuthContext);
-
+  const [mobile, setMobile] = useState(""); // ✅ Add mobile state
   const [data, setData] = useState([]);
-  const [showInterest, setShowInterest] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ Add loading
+  
+  // Step-based flow
+  const [step, setStep] = useState("LIST");
   const [selectedItem, setSelectedItem] = useState(null);
   const [planData, setPlanData] = useState(null);
 
-  // fetch doctor data
-  async function getData(mobile) {
+  // ✅ Fixed: Handle mobile input + loading
+  async function getData(searchMobile) {
+    if (!searchMobile || searchMobile.trim() === "") {
+      console.log("❌ Empty mobile number");
+      return;
+    }
+
     try {
+      setLoading(true);
+      console.log("🔍 Searching for mobile:", searchMobile);
+      
       const res = await axios.post(
         'https://svcdev.whitecoats.com/agent/getLeadDoctorByMobile',
-        {  mobileNo: "6301830161" },
+        { mobileNo: searchMobile }, // ✅ Use searchMobile param
         { headers: { Authorization: `Bearer ${sessionToken}` } }
       );
 
-      console.log(res.data.leadDoctorByMobileNumber);
+      console.log("✅ Doctors found:", res.data.leadDoctorByMobileNumber);
       setData(res.data.leadDoctorByMobileNumber || []);
+      setStep("LIST");
     } catch (err) {
-      console.log('Error fetching doctor data:', err);
+      console.log('❌ Error fetching doctor data:', err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
-  // fetch plan data for selected doctor when Subscribe button is clicked
+  /* ---------------- STEP 1: DOCTOR LIST ---------------- */
+  if (step === "LIST") {
+    return (
+      <View style={{ flex: 1 }}>
+        {/* ✅ Fixed DateRangePicker */}
+        <DateRangePicker
+          showMobile={true}
+          onMobileChange={setMobile} // ✅ Store mobile value
+          onSubmit={() => getData(mobile)} // ✅ Pass mobile to getData
+          loading={loading} // ✅ Show loading in picker
+        />
+
+        {/* DOCTOR LIST */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#2563EB" />
+            <Text style={styles.loadingText}>Searching doctors...</Text>
+          </View>
+        ) : data.length > 0 ? (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => String(item.doctorId)}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            renderItem={({ item }) => (
+              <ExpandableCard
+                header={item.name}
+                subHeader={item.mobileNo}
+                showSubscribe={true}
+                onSubscribePress={() => handleSubscribe(item)}
+                rows={[
+                  { label: 'Email', value: item.email || 'N/A' },
+                  { label: 'Name', value: item.name },
+                  { label: 'Lead ID', value: item.leadId },
+                  { label: 'Specialization', value: item.specialization ?? 'N/A' },
+                  { label: 'Mobile No', value: item.mobileNo ?? 'N/A' },
+                ]}
+              />
+            )}
+          />
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="search-outline" size={48} color="#64748B" />
+            <Text style={styles.emptyText}>
+              {mobile ? `No doctors found for ${mobile}` : "Enter mobile number to search"}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  }
+
+  // handleSubscribe function (same as before)
   async function handleSubscribe(item) {
     try {
       const res = await axios.post(
@@ -47,111 +119,36 @@ function SearchLeadDoc() {
 
       setPlanData(res.data);
       setSelectedItem(item);
-      setShowInterest(true);
+      setStep("INTEREST_ROOT");
     } catch (err) {
       console.log('PLAN API ERROR:', err);
     }
   }
 
+  /* ---------------- STEP 2: INTEREST ROOT ---------------- */
   return (
     <View style={{ flex: 1 }}>
-      {/* DATE RANGE + MOBILE FILTER */}
-      <DateRangePicker
-        showMobile={true}
-        onMobileChange={(val) => {}}
-        onSubmit={(mobile) => getData(mobile)}
+      <InterestRoot
+        leadData={selectedItem}
+        planData={planData}
+        dropdowns={{}}
+        onClose={() => setStep("LIST")}
       />
-
-      {/* DOCTOR LIST */}
-      {data.length > 0 ? (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => String(item.doctorId)}
-          renderItem={({ item }) => (
-            <ExpandableCard
-              header={item.name}
-              subHeader={item.mobileNo}
-              showSubscribe={true}
-              onSubscribePress={() => handleSubscribe(item)}
-              rows={[
-                { label: 'Email', value: item.email },
-                { label: 'Name', value: item.name },
-                { label: 'Lead ID', value: item.leadId },
-                { label: 'Specialization', value: item.specialization ?? 'N/A' },
-                { label: 'Mobile No', value: item.mobileNo ?? 'N/A' },
-              ]}
-            />
-          )}
-        />
-      ) : (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
-          <Text>No results</Text>
-        </View>
-      )}
-
-      {/* INTEREST FLOW MODAL */}
-      <Modal
-        visible={showInterest}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowInterest(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            {/* Close button */}
-            <TouchableOpacity
-              style={styles.closeBtn}
-              onPress={() => setShowInterest(false)}
-            >
-              <Ionicons name="close" size={22} color="#0F172A" />
-            </TouchableOpacity>
-            <ScrollView
-                    contentContainerStyle={{ paddingTop: 40, paddingBottom: 20 }}
-                    showsVerticalScrollIndicator={false}
-                  >
-            {selectedItem && planData && (
-              <InterestFlow
-                leadData={selectedItem}
-                planData={planData}
-                sessionToken={sessionToken}
-                onClose={() => setShowInterest(false)}
-              />
-             
-            )}
-             </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
-  modalOverlay: {
+  emptyContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
-  modalContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    padding: 16,
-    maxHeight: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 12,
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    zIndex: 10,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 20,
-    padding: 6,
+  emptyText: {
+    fontSize: 16,
+    color: '#64748B',
   },
 });
 

@@ -5,13 +5,13 @@ import {
   Platform,
   ScrollView,
   TouchableWithoutFeedback,
+  Pressable
 } from "react-native";
 
 export default function BottomSheetModal({ children, onClose }) {
   return (
     <TouchableWithoutFeedback onPress={onClose}>
       <View style={styles.overlay}>
-        <TouchableWithoutFeedback>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.sheet}
@@ -24,7 +24,6 @@ export default function BottomSheetModal({ children, onClose }) {
               {children}
             </ScrollView>
           </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
       </View>
     </TouchableWithoutFeedback>
   );
